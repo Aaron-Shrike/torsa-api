@@ -61,4 +61,46 @@ class UsuarioController extends Controller
     {
         //
     }
+
+    public function IniciarSesion(Request $request)
+    {
+        $data = array();
+
+        try {
+            $request->validate([
+                'dni' => 'required',
+                'contrasenia' => 'required',
+            ]);
+
+            $usuario = Usuario::where('dni', $request->dni)->first(['dni', 'contrasenia','tipoUsuario','activo']);
+
+            if(isset($usuario['dni'])){
+                if($usuario['contrasenia'] == $request->contrasenia && $usuario['activo']){
+                    $data = [
+                        'usuario' => $usuario,
+                    ];
+                }else{
+                    $mensaje = 'El usuario no esta activo';
+
+                    $data = [
+                        'error' => true,
+                        'mensaje' => $mensaje
+                    ];
+                }
+            }else{
+                $mensaje = 'El usuario no esta registrado';
+
+                $data = [
+                    'error' => true,
+                    'mensaje' => $mensaje
+                ];
+            }
+
+            return response($data);
+        } catch (\Exception $ex) {
+            $data = $ex->getMessage();
+
+            return response($data, 400);
+        }
+    }
 }
