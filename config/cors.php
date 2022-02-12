@@ -20,11 +20,11 @@ return [
         'sanctum/csrf-cookie'
     ],
 
-    'allowed_methods' => [
+    'allowed_methods' => ['*'],
+
+    'allowed_origins' => [
         env('CORS_DOMAIN'),
     ],
-
-    'allowed_origins' => ['*'],
 
     'allowed_origins_patterns' => [],
 
