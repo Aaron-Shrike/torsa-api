@@ -16,7 +16,7 @@ class CreateCemergenciasTable extends Migration
         Schema::create('cemergencias', function (Blueprint $table) {
             $table->bigIncrements('codConEmergencia');
             $table->string('nombre',50);
-            $table->char('numero',20)->unique();
+            $table->char('numero',9)->unique();
             $table->string('parentesco',20);
             $table->timestamps();
         });
