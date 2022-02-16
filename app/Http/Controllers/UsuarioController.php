@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
-
+use App\Models\Tusuario;
 use App\Models\Usuario;
 use App\Models\Cemergencia;
 use App\Models\Trabajador;
@@ -132,8 +132,8 @@ class UsuarioController extends Controller
             'dni' => 'required',
             'contrasenia' => 'required',
         ]);
-        $consulta = Usuario::join('tipousuarios','usuarios.codTipoUsuario','=','tipousuarios.codTipoUsuario') 
-                    ->select('usuarios.dni','usuarios.contrasenia','tipousuarios.descripcion','usuarios.activo')
+        $consulta = Usuario::join('tusuarios','usuarios.codTipoUsuario','=','tusuarios.codTipoUsuario') 
+                    ->select('usuarios.dni','usuarios.contrasenia','tusuarios.descripcion','usuarios.activo')
                     ->where('usuarios.dni','=',$request->dni)
                     ->first();
         if(isset($consulta['dni']))

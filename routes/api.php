@@ -27,6 +27,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 
 //Rutas API
+Route::post('/iniciar-sesion', [UsuarioController::class, 'IniciarSesion']);
 Route::post('/cerrar-sesion', [UsuarioController::class, 'cerrarSesion']);
 
 Route::middleware(['auth:sanctum'])->group(function () {
