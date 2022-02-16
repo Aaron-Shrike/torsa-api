@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Usuario;
+use App\Models\Cemergencia;
+use App\Models\Trabajador;
 use Illuminate\Http\Request;
 
 class UsuarioController extends Controller
@@ -26,6 +28,65 @@ class UsuarioController extends Controller
     public function store(Request $request)
     {
         //
+    }
+
+    public function nuevo(Request $request){
+
+         $request->validate([
+             'nombreC'=>'required',
+             'numero'=>'required',
+             'parentesco'=>'required',
+             'nombreT'=>'required',
+             'apePaterno'=>'required',
+             'apeMaterno'=>'required',
+             'fecNacimiento'=>'required',
+             'telefono'=>'required',
+             'domicilio'=>'required',
+             'correo'=>'required',
+             'codTipoCargo'=>'required',
+             'dni'=>'required',
+             'contrasenia'=>'required',
+            'activo'=>'1'
+         ]);
+        $cemergencias = new Cemergencia([
+            'nombre'=>$request->get('nombreC'),
+            'numero'=>$request->get('numero'),
+            'parentesco'=>$request->get('parentesco')
+        ]);
+
+         $cemergencias->save();
+        
+
+        // $request->validate([
+            
+        //]);
+            $trabajador = new Trabajador([
+                'nombre'=>$request->get('nombreT'),
+                'apePaterno'=>$request->get('apePaterno'),
+                'apeMaterno'=>$request->get('apeMaterno'),
+                'fecNacimiento'=>$request->get('fecNacimiento'),
+                'telefono'=>$request->get('telefono'),
+                'domicilio'=>$request->get('domicilio'),
+                'correo'=>$request->get('correo'),
+                'codTipoCargo'=>$request->get('codTipoCargo'),
+                'codConEmergencia'=>$cemergencias->codConEmergencia
+
+             ]);
+             $trabajador->save();
+
+        //$request->validate([
+            
+        //]);
+             $usuario = new Usuario([
+                 'dni'=>$request->get('dni'),
+                 'contrasenia'=>$request->get('contrasenia'),
+                 'activo'=>1,
+                 'codTrabajador'=>$trabajador->codTrabajador,
+                 'codTipoUsuario'=>$request->get('codTipoUsuario')
+             ]);
+             $usuario->save();
+             
+             
     }
 
     /**
@@ -64,43 +125,74 @@ class UsuarioController extends Controller
 
     public function IniciarSesion(Request $request)
     {
-        $data = array();
-
-        try {
-            $request->validate([
-                'dni' => 'required',
-                'contrasenia' => 'required',
-            ]);
-
-            $usuario = Usuario::where('dni', $request->dni)->first(['dni', 'contrasenia','tipoUsuario','activo']);
-
-            if(isset($usuario['dni'])){
-                if($usuario['contrasenia'] == $request->contrasenia && $usuario['activo']){
-                    $data = [
-                        'usuario' => $usuario,
-                    ];
-                }else{
-                    $mensaje = 'El usuario no esta activo';
-
-                    $data = [
-                        'error' => true,
-                        'mensaje' => $mensaje
-                    ];
+        $data=array();
+        try
+        {
+        $request->validate([
+            'dni' => 'required',
+            'contrasenia' => 'required',
+        ]);
+        $consulta = Usuario::join('tipousuarios','usuarios.codTipoUsuario','=','tipousuarios.codTipoUsuario') 
+                    ->select('usuarios.dni','usuarios.contrasenia','tipousuarios.descripcion','usuarios.activo')
+                    ->where('usuarios.dni','=',$request->dni)
+                    ->first();
+        if(isset($consulta['dni']))
+        {
+            if($consulta['activo'])
+            {    
+                if($consulta['contrasenia'] == $request->contrasenia)
+                {
+                    //if($consulta['descripcion'] == 'Promotor')
+                    //{
+                            $data = [
+                                'consulta' => $consulta,
+                            ];
+                    //}
+                    //else
+                    //{
+                      //      $mensaje = 'Usuario no es promotor';
+        
+                        //    $data = [
+                          //      'error' => true,
+                            //    'mensaje' => $mensaje
+                            //];
+                    //}   
+                }   
+                else
+                {
+                        $mensaje = 'Contraseña no coincide con el usuario';
+    
+                        $data = [
+                            'error' => true,
+                            'mensaje' => $mensaje
+                        ];
                 }
-            }else{
-                $mensaje = 'El usuario no esta registrado';
+            }
+            else
+            {
+                $mensaje = 'Cuenta inactiva no podrá iniciar sesión';
 
                 $data = [
                     'error' => true,
                     'mensaje' => $mensaje
                 ];
             }
-
-            return response($data);
-        } catch (\Exception $ex) {
-            $data = $ex->getMessage();
-
-            return response($data, 400);
         }
+        else
+        {
+            $mensaje = 'El dni no se encuentra registrado como usuario';
+
+            $data = [
+                'error' => true,
+                'mensaje' => $mensaje
+            ];
+        }
+        return response($data);
+    }
+    catch (\Exception $ex) 
+    {
+        $data = $ex->getMessage();
+        return response($data, 400);
+    }
     }
 }
