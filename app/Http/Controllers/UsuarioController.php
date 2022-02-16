@@ -1,11 +1,16 @@
 <?php
 
 namespace App\Http\Controllers;
+
+use App\Mail\TestMail;
 use App\Models\Tusuario;
 use App\Models\Usuario;
 use App\Models\Cemergencia;
 use App\Models\Trabajador;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Mail;
+use SebastianBergmann\CodeCoverage\Driver\Selector;
 
 class UsuarioController extends Controller
 {
@@ -45,7 +50,6 @@ class UsuarioController extends Controller
              'correo'=>'required',
              'codTipoCargo'=>'required',
              'dni'=>'required',
-             'contrasenia'=>'required',
             'activo'=>'1'
          ]);
         $cemergencias = new Cemergencia([
@@ -79,14 +83,16 @@ class UsuarioController extends Controller
         //]);
              $usuario = new Usuario([
                  'dni'=>$request->get('dni'),
-                 'contrasenia'=>$request->get('contrasenia'),
+                 'contrasenia'=>Str::random(10),
                  'activo'=>1,
                  'codTrabajador'=>$trabajador->codTrabajador,
                  'codTipoUsuario'=>$request->get('codTipoUsuario')
              ]);
              $usuario->save();
-             
-             
+
+             $receivers = Trabajador::pluck('correo');
+             Mail::to($receivers)->send(new TestMail($usuario));
+             return "Correo Electronico Enviado";
     }
 
     /**

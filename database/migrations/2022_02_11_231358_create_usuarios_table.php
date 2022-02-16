@@ -18,7 +18,7 @@ class CreateUsuariosTable extends Migration
             $table->char('dni', 8)->unique();
             $table->string('contrasenia', 30);
             $table->boolean('activo');
-            $table->unsignedBigInteger('codTrabajador')->unique()->nullable();
+            $table->unsignedBigInteger('codTrabajador')->nullable();
             $table->unsignedBigInteger('codTipoUsuario')->unique()->nullable();
 
             $table->foreign('codTrabajador')
