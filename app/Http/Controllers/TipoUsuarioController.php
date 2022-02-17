@@ -14,7 +14,8 @@ class TipoUsuarioController extends Controller
      */
     public function index()
     {
-        //
+        $tusuarios = TipoUsuario::all();
+        return \response($tusuarios);
     }
 
     /**
@@ -25,7 +26,14 @@ class TipoUsuarioController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'descripcion' => 'required'
+        ]);
+
+        $tusuarios = TipoUsuario::create($request->all());
+
+        return response()->json($tusuarios,201);
+
     }
 
     /**
@@ -36,7 +44,7 @@ class TipoUsuarioController extends Controller
      */
     public function show($id)
     {
-        //
+        return TipoUsuario::find($id);
     }
 
     /**
@@ -48,7 +56,9 @@ class TipoUsuarioController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        $tusuario = TipoUsuario::findOrFail($id)->update($request->all());
+
+        return response()->json($tusuario,200);
     }
 
     /**
