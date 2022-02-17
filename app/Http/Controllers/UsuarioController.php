@@ -6,6 +6,7 @@ use App\Mail\TestMail;
 use App\Models\Tusuario;
 use App\Models\Usuario;
 use App\Models\Cemergencia;
+use App\Models\ContactoEmergencia;
 use App\Models\Trabajador;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -52,7 +53,7 @@ class UsuarioController extends Controller
              'dni'=>'required',
             'activo'=>'1'
          ]);
-        $cemergencias = new Cemergencia([
+        $cemergencias = new ContactoEmergencia([
             'nombre'=>$request->get('nombreC'),
             'numero'=>$request->get('numero'),
             'parentesco'=>$request->get('parentesco')
