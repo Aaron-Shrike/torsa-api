@@ -13,7 +13,7 @@ class Trabajador extends Model
     protected $table = "trabajadors";
 
     protected $fillable = [
-        'nombre','apePaterno','apeMaterno','fecNacimiento','telefono','domicilio','correo','tcargo','cemergencia'
+        'nombre','apePaterno','apeMaterno','fecNacimiento','telefono','domicilio','correo','codTipoCargo','codConEmergencia'
     ];
 
     //Relacion uno a uno con Usuario
