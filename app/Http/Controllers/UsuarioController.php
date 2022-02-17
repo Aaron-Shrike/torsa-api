@@ -76,6 +76,9 @@ class UsuarioController extends Controller
                 'codConEmergencia'=>$cemergencias->codConEmergencia
 
              ]);
+             
+             
+            
              $trabajador->save();
 
         //$request->validate([
@@ -86,13 +89,14 @@ class UsuarioController extends Controller
                  'contrasenia'=>Str::random(10),
                  'activo'=>1,
                  'codTrabajador'=>$trabajador->codTrabajador,
-                 'codTipoUsuario'=>$request->get('codTipoUsuario')
+                 //'codTipoUsuario'=>$request->get('codTipoUsuario')
              ]);
              $usuario->save();
-
-             $receivers = Trabajador::pluck('correo');
+            
+             $receivers = Trabajador::all('correo')->max('correo');
              Mail::to($receivers)->send(new TestMail($usuario));
              return "Correo Electronico Enviado";
+             
     }
 
     /**
