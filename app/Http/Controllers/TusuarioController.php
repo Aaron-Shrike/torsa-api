@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Tcargo;
 use App\Models\Tusuario;
 use Illuminate\Http\Request;
 
@@ -14,7 +15,8 @@ class TusuarioController extends Controller
      */
     public function index()
     {
-        //
+        $tusuarios = Tusuario::all();
+        return \response($tusuarios);
     }
 
     /**
@@ -25,7 +27,14 @@ class TusuarioController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'descripcion' => 'required'
+        ]);
+
+        $tusuarios = Tusuario::create($request->all());
+
+        return response()->json($tusuarios,201);
+
     }
 
     /**
@@ -36,7 +45,7 @@ class TusuarioController extends Controller
      */
     public function show($id)
     {
-        //
+        return Tusuario::find($id);
     }
 
     /**
@@ -48,7 +57,9 @@ class TusuarioController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        $tusuario = Tusuario::findOrFail($id)->update($request->all());
+
+        return response()->json($tusuario,200);
     }
 
     /**

@@ -89,7 +89,7 @@ class UsuarioController extends Controller
                  'contrasenia'=>Str::random(10),
                  'activo'=>1,
                  'codTrabajador'=>$trabajador->codTrabajador,
-                 //'codTipoUsuario'=>$request->get('codTipoUsuario')
+                 'codTipoUsuario'=>$request->get('codTipoUsuario')
              ]);
              $usuario->save();
             
