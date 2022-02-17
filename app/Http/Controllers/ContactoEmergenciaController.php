@@ -2,11 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\ContactoEmergencia;
 use Illuminate\Http\Request;
-use App\Models\Tcargo;
 
-
-class TcargoController extends Controller
+class ContactoEmergenciaController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -15,8 +14,8 @@ class TcargoController extends Controller
      */
     public function index()
     {
-        $tcargos = Tcargo::all();
-        return \response($tcargos);
+        $cemergencias = ContactoEmergencia::all();
+        return \response($cemergencias);
     }
 
     /**
@@ -28,12 +27,14 @@ class TcargoController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'descripcion' => 'required'
+            'nombre' => 'required',
+            'numero'=>'required',
+            'parentesco'=>'required'
         ]);
 
-        $tcargos = Tcargo::create($request->all());
+        $cemergencias = ContactoEmergencia::create($request->all());
 
-        return response()->json($tcargos,201);
+        return response()->json($cemergencias,201);
     }
 
     /**
@@ -44,7 +45,7 @@ class TcargoController extends Controller
      */
     public function show($id)
     {
-        return Tcargo::find($id);
+        return ContactoEmergencia::findOrFail($id);
     }
 
     /**
@@ -54,14 +55,11 @@ class TcargoController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    
-    //dd(request->all());
     public function update(Request $request, $id)
     {
-        
-        $tcargo = Tcargo::findOrFail($id)->update($request->all());
-        
-        return response()->json($tcargo,200);
+        $cemergencias = ContactoEmergencia::findOrFail($id)->update($request->all());
+
+        return response()->json($cemergencias,200);
     }
 
     /**
@@ -72,8 +70,8 @@ class TcargoController extends Controller
      */
     public function destroy($id)
     {
-        $tcargo = Tcargo::findOrFail($id);
-        $tcargo->delete();
+        $cemergencia = ContactoEmergencia::findOnFail($id);
+        $cemergencia->delete();
         return response()->json(null,204);
     }
 }

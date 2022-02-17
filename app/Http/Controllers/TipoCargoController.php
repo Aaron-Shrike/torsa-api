@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Cemergencia;
+use App\Models\TipoCargo;
 use Illuminate\Http\Request;
 
-class CemergenciaController extends Controller
+class TipoCargoController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -14,8 +14,8 @@ class CemergenciaController extends Controller
      */
     public function index()
     {
-        $cemergencias = Cemergencia::all();
-        return \response($cemergencias);
+        $tcargos = TipoCargo::all();
+        return \response($tcargos);
     }
 
     /**
@@ -27,14 +27,12 @@ class CemergenciaController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'nombre' => 'required',
-            'numero'=>'required',
-            'parentesco'=>'required'
+            'descripcion' => 'required'
         ]);
 
-        $cemergencias = Cemergencia::create($request->all());
+        $tcargos = TipoCargo::create($request->all());
 
-        return response()->json($cemergencias,201);
+        return response()->json($tcargos,201);
     }
 
     /**
@@ -45,7 +43,7 @@ class CemergenciaController extends Controller
      */
     public function show($id)
     {
-        return Cemergencia::findOrFail($id);
+        return TipoCargo::find($id);
     }
 
     /**
@@ -55,11 +53,14 @@ class CemergenciaController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
+    
+    //dd(request->all());
     public function update(Request $request, $id)
     {
-        $cemergencias = Cemergencia::findOrFail($id)->update($request->all());
-
-        return response()->json($cemergencias,200);
+        
+        $tcargo = TipoCargo::findOrFail($id)->update($request->all());
+        
+        return response()->json($tcargo,200);
     }
 
     /**
@@ -70,8 +71,8 @@ class CemergenciaController extends Controller
      */
     public function destroy($id)
     {
-        $cemergencia = Cemergencia::findOnFail($id);
-        $cemergencia->delete();
+        $tcargo = TipoCargo::findOrFail($id);
+        $tcargo->delete();
         return response()->json(null,204);
     }
 }

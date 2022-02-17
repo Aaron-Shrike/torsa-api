@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Tusuario;
+use App\Models\TipoUsuario;
 use Illuminate\Http\Request;
 
-class TusuarioController extends Controller
+class TipoUsuarioController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -59,7 +59,7 @@ class TusuarioController extends Controller
      */
     public function destroy($id)
     {
-        $tususario = Tusuario::findOnFile($id);
+        $tususario = TipoUsuario::findOnFile($id);
         $tususario->delete();
         return response()->json(null,204);
     }

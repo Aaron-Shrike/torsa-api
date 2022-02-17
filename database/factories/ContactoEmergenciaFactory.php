@@ -2,12 +2,18 @@
 
 namespace Database\Factories;
 
+use App\Models\ContactoEmergencia;
 use Illuminate\Database\Eloquent\Factories\Factory;
-use App\Models\Cemergencia;
 
-class CemergenciaFactory extends Factory
+class ContactoEmergenciaFactory extends Factory
 {
-    protected $model = Cemergencia::class;
+    /**
+     * The name of the factory's corresponding model.
+     *
+     * @var string
+     */
+    protected $model = ContactoEmergencia::class;
+
     /**
      * Define the model's default state.
      *
@@ -17,7 +23,7 @@ class CemergenciaFactory extends Factory
     {
         return [
             'nombre'=>$this->faker->name(),
-            'numero'=>$this->faker->phoneNumber(),
+            'numero'=>$this->faker->numberBetween($min = 111111111, $max = 999999999),
             'parentesco'=>$this->faker->randomElement(['Padre','Hermano','Hijo','Tio'])
         ];
     }
