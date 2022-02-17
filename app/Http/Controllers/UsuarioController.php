@@ -137,73 +137,76 @@ class UsuarioController extends Controller
     public function IniciarSesion(Request $request)
     {
         $data=array();
+        
         try
         {
-        $request->validate([
-            'dni' => 'required',
-            'contrasenia' => 'required',
-        ]);
-        $consulta = Usuario::join('tusuarios','usuarios.codTipoUsuario','=','tusuarios.codTipoUsuario') 
-                    ->select('usuarios.dni','usuarios.contrasenia','tusuarios.descripcion','usuarios.activo')
-                    ->where('usuarios.dni','=',$request->dni)
-                    ->first();
-        if(isset($consulta['dni']))
-        {
-            if($consulta['activo'])
-            {    
-                if($consulta['contrasenia'] == $request->contrasenia)
-                {
-                    //if($consulta['descripcion'] == 'Promotor')
-                    //{
-                            $data = [
-                                'consulta' => $consulta,
-                            ];
-                    //}
-                    //else
-                    //{
-                      //      $mensaje = 'Usuario no es promotor';
-        
-                        //    $data = [
-                          //      'error' => true,
-                            //    'mensaje' => $mensaje
-                            //];
-                    //}   
-                }   
-                else
-                {
+            $request->validate([
+                'dni' => 'required',
+                'contrasenia' => 'required',
+            ]);
+
+            $consulta = Usuario::join('tusuarios','usuarios.codTipoUsuario','=','tusuarios.codTipoUsuario') 
+                            ->select('usuarios.dni','usuarios.contrasenia','tusuarios.descripcion','usuarios.activo')
+                            ->where('usuarios.dni','=',$request->dni)
+                            ->first();
+
+            if(isset($consulta['dni']))
+            {
+                if($consulta['activo'])
+                {    
+                    if($consulta['contrasenia'] == $request->contrasenia)
+                    {
+                        //if($consulta['descripcion'] == 'Promotor')
+                        //{
+                                $data = [
+                                    'consulta' => $consulta,
+                                ];
+                        //}
+                        //else
+                        //{
+                        //      $mensaje = 'Usuario no es promotor';
+            
+                            //    $data = [
+                            //      'error' => true,
+                                //    'mensaje' => $mensaje
+                                //];
+                        //}   
+                    }   
+                    else
+                    {
                         $mensaje = 'Contraseña no coincide con el usuario';
     
                         $data = [
                             'error' => true,
                             'mensaje' => $mensaje
                         ];
+                    }
+                }
+                else
+                {
+                    $mensaje = 'Cuenta inactiva no podrá iniciar sesión';
+
+                    $data = [
+                        'error' => true,
+                        'mensaje' => $mensaje
+                    ];
                 }
             }
             else
             {
-                $mensaje = 'Cuenta inactiva no podrá iniciar sesión';
+                $mensaje = 'El dni no se encuentra registrado como usuario';
 
                 $data = [
                     'error' => true,
                     'mensaje' => $mensaje
                 ];
             }
+            return response($data);
         }
-        else
+        catch (\Exception $ex) 
         {
-            $mensaje = 'El dni no se encuentra registrado como usuario';
-
-            $data = [
-                'error' => true,
-                'mensaje' => $mensaje
-            ];
+            $data = $ex->getMessage();
+            return response($data, 400);
         }
-        return response($data);
-    }
-    catch (\Exception $ex) 
-    {
-        $data = $ex->getMessage();
-        return response($data, 400);
-    }
     }
 }
