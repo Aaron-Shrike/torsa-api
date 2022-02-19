@@ -9,8 +9,8 @@ class Tcargo extends Model
 {
     use HasFactory;
 
-    protected $primaryKey = "codTipoCargo";
-    protected $table = "tcargos";
+    protected $primaryKey = "codTipoCargo"; //codTipoCargo
+    protected $table = "tcargos"; //tcargos
     protected $fillable = ['descripcion'];
 
     //Relacion Uno a Muchos

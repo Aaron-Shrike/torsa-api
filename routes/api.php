@@ -31,9 +31,9 @@ Route::post('/iniciar-sesion', [UsuarioController::class, 'IniciarSesion']);
 Route::post('/cerrar-sesion', [UsuarioController::class, 'cerrarSesion']);
 
 Route::middleware(['auth:sanctum'])->group(function () {
-    Route::post('/registrar-trabajador', [TrabajadorController::class, 'store']); 
-    
-    // Route::post('/registrar-solicitud', [, 'store']); 
+    Route::post('/registrar-trabajador', [TrabajadorController::class, 'store']);
+
+    // Route::post('/registrar-solicitud', [, 'store']);
 
 
 });
@@ -45,3 +45,5 @@ Route::apiResource('cemergencias',CemergenciaController::class);
 Route::apiResource('trabajadors',TrabajadorController::class);
 
 Route::post('usuarios', 'App\Http\Controllers\UsuarioController@nuevo');
+Route::post('validarDNI', 'App\Http\Controllers\UsuarioController@validarDNI');
+Route::post('validarEmail', 'App\Http\Controllers\UsuarioController@validarEmail');

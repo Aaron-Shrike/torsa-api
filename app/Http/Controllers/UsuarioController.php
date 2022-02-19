@@ -7,10 +7,12 @@ use App\Models\Tusuario;
 use App\Models\Usuario;
 use App\Models\Cemergencia;
 use App\Models\Trabajador;
+use Egulias\EmailValidator\Validation\RFCValidation;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Mail;
 use SebastianBergmann\CodeCoverage\Driver\Selector;
+use Egulias\EmailValidator\EmailValidator;
 
 class UsuarioController extends Controller
 {
@@ -47,10 +49,10 @@ class UsuarioController extends Controller
              'fecNacimiento'=>'required',
              'telefono'=>'required',
              'domicilio'=>'required',
-             'correo'=>'required',
+             'correo'=>'required|email',
              'codTipoCargo'=>'required',
              'dni'=>'required',
-            'activo'=>'1'
+            'activo'=>'required'
          ]);
         $cemergencias = new Cemergencia([
             'nombre'=>$request->get('nombreC'),
@@ -59,10 +61,10 @@ class UsuarioController extends Controller
         ]);
 
          $cemergencias->save();
-        
+
 
         // $request->validate([
-            
+
         //]);
             $trabajador = new Trabajador([
                 'nombre'=>$request->get('nombreT'),
@@ -79,7 +81,7 @@ class UsuarioController extends Controller
              $trabajador->save();
 
         //$request->validate([
-            
+
         //]);
              $usuario = new Usuario([
                  'dni'=>$request->get('dni'),
@@ -90,11 +92,30 @@ class UsuarioController extends Controller
              ]);
              $usuario->save();
 
-             $receivers = Trabajador::pluck('correo');
-             Mail::to($receivers)->send(new TestMail($usuario));
-             return "Correo Electronico Enviado";
+             //$receivers = Trabajador::pluck('correo');
+        $receivers = $trabajador['correo'];
+            Mail::to($receivers)->send(new TestMail($usuario));
+            return "Correo Electronico Enviado";
+
     }
 
+    public function validarDNI(Request $request){
+        $request->validate([
+            'dni'=>'required'
+        ]);
+        $consulta = Usuario::where('usuarios.dni','=',$request->dni)
+            ->count();
+        return response()->json($consulta, 200);
+    }
+
+    public function validarEmail(Request $request){
+        $request->validate([
+            'correo'=>'required'
+        ]);
+        $consulta = Trabajador::where('trabajadors.correo','=',$request->correo)
+            ->count();
+        return response()->json($consulta, 200);
+    }
     /**
      * Display the specified resource.
      *
@@ -138,14 +159,14 @@ class UsuarioController extends Controller
             'dni' => 'required',
             'contrasenia' => 'required',
         ]);
-        $consulta = Usuario::join('tusuarios','usuarios.codTipoUsuario','=','tusuarios.codTipoUsuario') 
+        $consulta = Usuario::join('tusuarios','usuarios.codTipoUsuario','=','tusuarios.codTipoUsuario')
                     ->select('usuarios.dni','usuarios.contrasenia','tusuarios.descripcion','usuarios.activo')
                     ->where('usuarios.dni','=',$request->dni)
                     ->first();
         if(isset($consulta['dni']))
         {
             if($consulta['activo'])
-            {    
+            {
                 if($consulta['contrasenia'] == $request->contrasenia)
                 {
                     //if($consulta['descripcion'] == 'Promotor')
@@ -157,17 +178,17 @@ class UsuarioController extends Controller
                     //else
                     //{
                       //      $mensaje = 'Usuario no es promotor';
-        
+
                         //    $data = [
                           //      'error' => true,
                             //    'mensaje' => $mensaje
                             //];
-                    //}   
-                }   
+                    //}
+                }
                 else
                 {
                         $mensaje = 'Contraseña no coincide con el usuario';
-    
+
                         $data = [
                             'error' => true,
                             'mensaje' => $mensaje
@@ -195,7 +216,7 @@ class UsuarioController extends Controller
         }
         return response($data);
     }
-    catch (\Exception $ex) 
+    catch (\Exception $ex)
     {
         $data = $ex->getMessage();
         return response($data, 400);

@@ -16,7 +16,8 @@ class TcargoController extends Controller
     public function index()
     {
         $tcargos = Tcargo::all();
-        return \response($tcargos);
+        return //\response($tcargos);
+        response()->json($tcargos, 200);
     }
 
     /**
@@ -54,13 +55,13 @@ class TcargoController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    
+
     //dd(request->all());
     public function update(Request $request, $id)
     {
-        
+
         $tcargo = Tcargo::findOrFail($id)->update($request->all());
-        
+
         return response()->json($tcargo,200);
     }
 
