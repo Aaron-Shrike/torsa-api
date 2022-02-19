@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Tusuario extends Model
+class TipoUsuario extends Model
 {
     use HasFactory;
 
@@ -13,8 +13,8 @@ class Tusuario extends Model
     protected $table = "tusuarios";
     protected $fillable = ['descripcion'];
 
-     //Relacion Uno a Muchos
-     public function usuarios(){
+    //Relacion Uno a Muchos
+    public function usuarios(){
         return $this->hasMany('App\Models\usuarios');
     }
 

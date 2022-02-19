@@ -18,8 +18,8 @@ class CreateUsuariosTable extends Migration
             $table->char('dni', 8)->unique();
             $table->string('contrasenia', 30);
             $table->boolean('activo');
-            $table->unsignedBigInteger('codTrabajador')->nullable();
-            $table->unsignedBigInteger('codTipoUsuario')->unique()->nullable();
+            $table->unsignedBigInteger('codTrabajador')->unique()->nullable();
+            $table->unsignedBigInteger('codTipoUsuario')->nullable();
 
             $table->foreign('codTrabajador')
             ->references('codTrabajador')
@@ -31,7 +31,6 @@ class CreateUsuariosTable extends Migration
             ->onDelete('set null');
 
             $table->timestamps();
-
         });
     }
 

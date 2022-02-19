@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Cemergencia;
+use App\Models\ContactoEmergencia;
 use App\Models\Tcargo;
+use App\Models\TipoCargo;
 use App\Models\Trabajador;
 use App\Models\Usuario;
 use Illuminate\Http\Request;
@@ -51,7 +53,7 @@ class TrabajadorController extends Controller
             'codConEmergencia'=>'required'
         ]);
 
-        $cemergencias = new Cemergencia([
+        $cemergencias = new ContactoEmergencia([
             'nombre'=>$request->get('nombreC'),
             'numero'=>$request->get('numero'),
             'parentesco'=>$request->get('parentesco')
@@ -59,7 +61,7 @@ class TrabajadorController extends Controller
 
          $cemergencias->save();
 
-         $tcargo = new Tcargo([
+         $tcargo = new TipoCargo([
             'descipcion'=>$request->get("descripcion"),
 
          ]);
@@ -137,7 +139,7 @@ class TrabajadorController extends Controller
             'codConEmergencia'=>'required'
         ]);
 
-        $cemergencias = new Cemergencia([
+        $cemergencias = new ContactoEmergencia([
             'nombre'=>$request->get('nombreC'),
             'numero'=>$request->get('numero'),
             'parentesco'=>$request->get('parentesco')
@@ -145,7 +147,7 @@ class TrabajadorController extends Controller
 
          $cemergencias->save();
 
-         $tcargo = new Tcargo([
+         $tcargo = new TipoCargo([
             'descipcion'=>$request->get("descripcion"),
 
          ]);

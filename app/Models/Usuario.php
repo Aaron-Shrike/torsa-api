@@ -11,7 +11,7 @@ class Usuario extends Model
 
     protected $primaryKey = "codUsuario";
     protected $table = "usuarios";
-    protected $fillable = ['dni','contrasenia','activo','trabajador_id','tusuario_id'];
+    protected $fillable = ['dni','contrasenia','activo','codTrabajador','codTipoUsuario'];
 
     //Relacion Uno a Uno con Trabajador
     public function trabajador(){

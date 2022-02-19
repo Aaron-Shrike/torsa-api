@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Cemergencia;
+use App\Models\TipoUsuario;
 use Illuminate\Http\Request;
 
-class CemergenciaController extends Controller
+class TipoUsuarioController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -14,8 +14,8 @@ class CemergenciaController extends Controller
      */
     public function index()
     {
-        $cemergencias = Cemergencia::all();
-        return \response($cemergencias);
+        $tusuarios = TipoUsuario::all();
+        return \response($tusuarios);
     }
 
     /**
@@ -27,14 +27,13 @@ class CemergenciaController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'nombre' => 'required',
-            'numero'=>'required',
-            'parentesco'=>'required'
+            'descripcion' => 'required'
         ]);
 
-        $cemergencias = Cemergencia::create($request->all());
+        $tusuarios = TipoUsuario::create($request->all());
 
-        return response()->json($cemergencias,201);
+        return response()->json($tusuarios,201);
+
     }
 
     /**
@@ -45,7 +44,7 @@ class CemergenciaController extends Controller
      */
     public function show($id)
     {
-        return Cemergencia::findOrFail($id);
+        return TipoUsuario::find($id);
     }
 
     /**
@@ -57,9 +56,9 @@ class CemergenciaController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $cemergencias = Cemergencia::findOrFail($id)->update($request->all());
+        $tusuario = TipoUsuario::findOrFail($id)->update($request->all());
 
-        return response()->json($cemergencias,200);
+        return response()->json($tusuario,200);
     }
 
     /**
@@ -70,8 +69,8 @@ class CemergenciaController extends Controller
      */
     public function destroy($id)
     {
-        $cemergencia = Cemergencia::findOnFail($id);
-        $cemergencia->delete();
+        $tususario = TipoUsuario::findOnFile($id);
+        $tususario->delete();
         return response()->json(null,204);
     }
 }

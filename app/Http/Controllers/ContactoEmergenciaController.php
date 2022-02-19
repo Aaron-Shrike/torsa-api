@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Tusuario;
+use App\Models\ContactoEmergencia;
 use Illuminate\Http\Request;
 
-class TusuarioController extends Controller
+class ContactoEmergenciaController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -14,7 +14,8 @@ class TusuarioController extends Controller
      */
     public function index()
     {
-        //
+        $cemergencias = ContactoEmergencia::all();
+        return \response($cemergencias);
     }
 
     /**
@@ -25,7 +26,15 @@ class TusuarioController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'nombre' => 'required',
+            'numero'=>'required',
+            'parentesco'=>'required'
+        ]);
+
+        $cemergencias = ContactoEmergencia::create($request->all());
+
+        return response()->json($cemergencias,201);
     }
 
     /**
@@ -36,7 +45,7 @@ class TusuarioController extends Controller
      */
     public function show($id)
     {
-        //
+        return ContactoEmergencia::findOrFail($id);
     }
 
     /**
@@ -48,7 +57,9 @@ class TusuarioController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        $cemergencias = ContactoEmergencia::findOrFail($id)->update($request->all());
+
+        return response()->json($cemergencias,200);
     }
 
     /**
@@ -59,8 +70,8 @@ class TusuarioController extends Controller
      */
     public function destroy($id)
     {
-        $tususario = Tusuario::findOnFile($id);
-        $tususario->delete();
+        $cemergencia = ContactoEmergencia::findOnFail($id);
+        $cemergencia->delete();
         return response()->json(null,204);
     }
 }

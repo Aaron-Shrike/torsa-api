@@ -2,12 +2,18 @@
 
 namespace Database\Factories;
 
+use App\Models\TipoCargo;
 use Illuminate\Database\Eloquent\Factories\Factory;
-use App\Models\Tcargo;
 
-class TcargoFactory extends Factory
+class TipoCargoFactory extends Factory
 {
-    protected $model = Tcargo::class;
+    /**
+     * The name of the factory's corresponding model.
+     *
+     * @var string
+     */
+    protected $model = TipoCargo::class;
+
     /**
      * Define the model's default state.
      *
