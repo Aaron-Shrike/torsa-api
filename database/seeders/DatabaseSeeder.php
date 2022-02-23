@@ -3,9 +3,8 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use App\Models\Tusuario;
-use App\Models\Tcargo;
-use App\Models\Cemergencia;
+use App\Models\TipoCargo;
+use App\Models\ContactoEmergencia;
 
 class DatabaseSeeder extends Seeder
 {
@@ -18,9 +17,11 @@ class DatabaseSeeder extends Seeder
     {
         // \App\Models\User::factory(10)->create();
 
-       
-        Tusuario::factory(3)->create();
-        Tcargo::factory(4)->create();
-        Cemergencia::factory(3)->create();
+        TipoCargo::factory(4)->create();
+        ContactoEmergencia::factory(3)->create();
+
+        $this->call(TipoUsuarioSeeder::class);
+        $this->call(TrabajadorSeeder::class);
+        $this->call(UsuarioSeeder::class);
     }
 }

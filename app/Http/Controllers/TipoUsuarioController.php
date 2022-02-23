@@ -2,11 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Tcargo;
-use App\Models\Tusuario;
+use App\Models\TipoUsuario;
 use Illuminate\Http\Request;
 
-class TusuarioController extends Controller
+class TipoUsuarioController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -15,7 +14,7 @@ class TusuarioController extends Controller
      */
     public function index()
     {
-        $tusuarios = Tusuario::all();
+        $tusuarios = TipoUsuario::all();
         return \response($tusuarios);
     }
 
@@ -31,7 +30,7 @@ class TusuarioController extends Controller
             'descripcion' => 'required'
         ]);
 
-        $tusuarios = Tusuario::create($request->all());
+        $tusuarios = TipoUsuario::create($request->all());
 
         return response()->json($tusuarios,201);
 
@@ -45,7 +44,7 @@ class TusuarioController extends Controller
      */
     public function show($id)
     {
-        return Tusuario::find($id);
+        return TipoUsuario::find($id);
     }
 
     /**
@@ -57,7 +56,7 @@ class TusuarioController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $tusuario = Tusuario::findOrFail($id)->update($request->all());
+        $tusuario = TipoUsuario::findOrFail($id)->update($request->all());
 
         return response()->json($tusuario,200);
     }
@@ -70,7 +69,7 @@ class TusuarioController extends Controller
      */
     public function destroy($id)
     {
-        $tususario = Tusuario::findOnFile($id);
+        $tususario = TipoUsuario::findOnFile($id);
         $tususario->delete();
         return response()->json(null,204);
     }

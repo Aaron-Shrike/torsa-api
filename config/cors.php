@@ -16,7 +16,7 @@ return [
     */
 
     'paths' => [
-        'api/*', 
+        'api/*',
         'sanctum/csrf-cookie'
     ],
 
@@ -26,7 +26,7 @@ return [
         env('CORS_DOMAIN'),
     ],
 
-    'allowed_origins_patterns' => [],
+    'allowed_origins_patterns' => ['*'],
 
     'allowed_headers' => ['*'],
 

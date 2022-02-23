@@ -2,11 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Cemergencia;
 use App\Models\ContactoEmergencia;
 use Illuminate\Http\Request;
 
-class CemergenciaController extends Controller
+class ContactoEmergenciaController extends Controller
 {
     /**
      * Display a listing of the resource.

@@ -5,14 +5,13 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Cemergencia extends Model
+class TipoCargo extends Model
 {
     use HasFactory;
 
-    protected $primaryKey = "codConEmergencia";
-    protected $table = "cemergencias";
-
-    protected $fillable = ['nombre','numero','parentesco'];
+    protected $primaryKey = "codTipoCargo"; //codTipoCargo
+    protected $table = "tcargos"; //tcargos
+    protected $fillable = ['descripcion'];
 
     //Relacion Uno a Muchos
     public function trabajadors(){

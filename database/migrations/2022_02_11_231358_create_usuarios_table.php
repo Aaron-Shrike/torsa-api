@@ -31,7 +31,6 @@ class CreateUsuariosTable extends Migration
             ->onDelete('set null');
 
             $table->timestamps();
-
         });
     }
 
