@@ -11,6 +11,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Mail;
 use SebastianBergmann\CodeCoverage\Driver\Selector;
+use Illuminate\Contracts\Encryption\DecryptException;
+use Illuminate\Support\Facades\Crypt;
+use Illuminate\Support\Facades\Hash;
 
 class UsuarioController extends Controller
 {
@@ -86,14 +89,16 @@ class UsuarioController extends Controller
         //]);
              $usuario = new Usuario([
                  'dni'=>$request->get('dni'),
-                 'contrasenia'=>Str::random(10),
+                 'contrasenia'=>Crypt::encryptString(Str::random(10)),
                  'activo'=>1,
                  'codTrabajador'=>$trabajador->codTrabajador,
-                 'codTipoUsuario'=>$request->get('codTipoUsuario')
+                 'codTipoUsuario'=>$request->get('codTipoUsuario'),
+                 //'secret' => Crypt::encryptString($request->secret)
              ]);
              $usuario->save();
             
              $receivers = Trabajador::all('correo')->max('correo');
+
              Mail::to($receivers)->send(new TestMail($usuario));
              return "Correo Electronico Enviado";
              

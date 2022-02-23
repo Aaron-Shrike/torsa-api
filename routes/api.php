@@ -10,6 +10,7 @@ use App\Http\Controllers;
 use App\Http\Controllers\CemergenciaController;
 use App\Models\Cemergencia;
 use App\Models\Tcargo;
+use App\Models\Tusuario;
 
 /*
 |--------------------------------------------------------------------------
@@ -45,3 +46,5 @@ Route::apiResource('cemergencias',CemergenciaController::class);
 Route::apiResource('trabajadors',TrabajadorController::class);
 
 Route::post('usuarios', 'App\Http\Controllers\UsuarioController@nuevo');
+
+Route::apiResource('tusuarios',Tusuario::class);
