@@ -15,6 +15,7 @@ use SebastianBergmann\CodeCoverage\Driver\Selector;
 use Illuminate\Contracts\Encryption\DecryptException;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Hash;
+use Symfony\Component\HttpKernel\Event\ResponseEvent;
 
 class UsuarioController extends Controller
 {
@@ -25,7 +26,12 @@ class UsuarioController extends Controller
      */
     public function index()
     {
-        //
+        
+            $manuales = Usuario::select("manual.codmanual", "manual.nombre", "pdf", "video", "manual.descripcion")
+                ->join("manual_empresa", "manual.codmanual", "manual_empresa.codmanual")
+                ->get();
+
+        return response()->json($manuales, 200);
     }
 
     /**
@@ -40,6 +46,7 @@ class UsuarioController extends Controller
     }
 
     public function nuevo(Request $request){
+        //dd(request()->all());
 
          $request->validate([
              'nombreC'=>'required',
@@ -69,15 +76,15 @@ class UsuarioController extends Controller
 
         //]);
             $trabajador = new Trabajador([
+                'codConEmergencia'=>$cemergencias->codConEmergencia,
+                'codTipoCargo'=>$request->get('codTipoCargo'), 
                 'nombre'=>$request->get('nombreT'),
                 'apePaterno'=>$request->get('apePaterno'),
                 'apeMaterno'=>$request->get('apeMaterno'),
                 'fecNacimiento'=>$request->get('fecNacimiento'),
                 'telefono'=>$request->get('telefono'),
                 'domicilio'=>$request->get('domicilio'),
-                'correo'=>$request->get('correo'),
-                'codTipoCargo'=>$request->get('codTipoCargo'),
-                'codConEmergencia'=>$cemergencias->codConEmergencia
+                'correo'=>$request->get('correo'), 
 
              ]);
              $trabajador->save();
@@ -86,11 +93,12 @@ class UsuarioController extends Controller
 
         //]);
              $usuario = new Usuario([
+                'codTipoUsuario'=>$request->get('codTipoUsuario'),
+                'codTrabajador'=>$trabajador->codTrabajador,
                  'dni'=>$request->get('dni'),
                  'contrasenia'=>Crypt::encryptString(Str::random(10)),
                  'activo'=>1,
-                 'codTrabajador'=>$trabajador->codTrabajador,
-                 'codTipoUsuario'=>$request->get('codTipoUsuario'),
+                 
                  //'secret' => Crypt::encryptString($request->secret)
              ]);
              $usuario->save();

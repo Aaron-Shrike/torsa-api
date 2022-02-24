@@ -1,16 +1,17 @@
 <?php
 
 use App\Http\Controllers\TrabajadorController;
-use App\Http\Controllers\TcargoController;
+use App\Http\Controllers\TipoCargoController;
 use App\Http\Controllers\UsuarioController;
+use App\Http\Controllers\SocioController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\HomeController;
 use App\Http\Controllers;
-use App\Http\Controllers\CemergenciaController;
-use App\Models\Cemergencia;
-use App\Models\Tcargo;
-use App\Models\Tusuario;
+use App\Http\Controllers\ContactoEmergenciaController;
+use App\Http\Controllers\TipoUsuarioController;
+use App\Models\ContactoEmergencia;
+use App\Models\TipoCargo;
+use App\Models\TipoUsuario;
 
 /*
 |--------------------------------------------------------------------------
@@ -39,13 +40,14 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
 });
 
-Route::apiResource('tcargos',TcargoController::class);
+Route::apiResource('tipocargo',TipoCargoController::class);
+Route::apiResource('tipousuario',TipoUsuarioController::class);
 
-Route::apiResource('cemergencias',CemergenciaController::class);
+Route::apiResource('contactoemergencias',ContactoEmergenciaController::class);
 
-Route::apiResource('trabajadors',TrabajadorController::class);
+Route::apiResource('trabajador',TrabajadorController::class);
 
-Route::post('usuarios', 'App\Http\Controllers\UsuarioController@nuevo');
+Route::post('nuevo', 'App\Http\Controllers\UsuarioController@nuevo');
 Route::post('validarDNI', 'App\Http\Controllers\UsuarioController@validarDNI');
 Route::post('validarEmail', 'App\Http\Controllers\UsuarioController@validarEmail');
-Route::get('buscarSocioHabilitado','App\Http\Controller\SocioController@buscarSocioHabilitado');
+//Route::get('buscarSocioHabilitado','App\Http\Controller\SocioController@buscarSocioHabilitado');

@@ -2,9 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Cemergencia;
 use App\Models\ContactoEmergencia;
-use App\Models\Tcargo;
 use App\Models\TipoCargo;
 use App\Models\Trabajador;
 use App\Models\Usuario;
@@ -20,11 +18,11 @@ class TrabajadorController extends Controller
      */
     public function index()
     {
-        $trabajador = Trabajador::join("tcargos","tcargos.codTipoCargo","=","trabajadors.codTipoCargo")
-        ->join("cemergencias","cemergencias.codConEmergencia","=","trabajadors.codConEmergencia")
-        ->select("trabajadors.nombre","trabajadors.apePaterno","trabajadors.apeMaterno","trabajadors.fecNacimiento","trabajadors.telefono",
-        "trabajadors.domicilio","trabajadors.correo","tcargos.descripcion",
-        "cemergencias.nombre","cemergencias.numero","cemergencias.parentesco")
+        $trabajador = Trabajador::join("codTipoCargo","tipocargo.codTipoCargo","=","trabajador.codTipoCargo")
+        ->join("codConEmergencia","contactoemergencia.codConEmergencia","=","trabajador.codConEmergencia")
+        ->select("trabajador.nombre","trabajador.apePaterno","trabajador.apeMaterno","trabajador.fecNacimiento","trabajador.telefono",
+        "trabajador.domicilio","trabajador.correo","tcargo.descripcion",
+        "ccontactoemergencias.nombre","contactoemergencias.numero","contactoemergencias.parentesco")
         ->get();
 
         return response()->json($trabajador, 200);
