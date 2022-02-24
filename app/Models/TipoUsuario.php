@@ -10,13 +10,8 @@ class TipoUsuario extends Model
     use HasFactory;
 
     protected $primaryKey = "codTipoUsuario";
-    protected $table = "tusuarios";
+    protected $table = "tipousuario";
     protected $fillable = ['descripcion'];
-
-    //Relacion Uno a Muchos
-    public function usuarios(){
-        return $this->hasMany('App\Models\usuarios');
-    }
 
     public $timestamps = false;
 }

@@ -48,3 +48,4 @@ Route::apiResource('trabajadors',TrabajadorController::class);
 Route::post('usuarios', 'App\Http\Controllers\UsuarioController@nuevo');
 Route::post('validarDNI', 'App\Http\Controllers\UsuarioController@validarDNI');
 Route::post('validarEmail', 'App\Http\Controllers\UsuarioController@validarEmail');
+Route::get('buscarSocioHabilitado','App\Http\Controller\SocioController@buscarSocioHabilitado');

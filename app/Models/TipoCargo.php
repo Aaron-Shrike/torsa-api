@@ -9,14 +9,9 @@ class TipoCargo extends Model
 {
     use HasFactory;
 
-    protected $primaryKey = "codTipoCargo"; //codTipoCargo
-    protected $table = "tcargos"; //tcargos
-    protected $fillable = ['descripcion'];
-
-    //Relacion Uno a Muchos
-    public function trabajadors(){
-        return $this->hasMany('App\Models\Trabajador');
-    }
+    protected $primaryKey = "codTipoCargo"; 
+    protected $table = "tipocargo"; 
+    protected $fillable = ['descripcion'];    
 
     public $timestamps = false;
 }

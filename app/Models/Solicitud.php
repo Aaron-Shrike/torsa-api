@@ -9,8 +9,10 @@ class Solicitud extends Model
 {
     use HasFactory;
 
-    protected $primaryKey = "idSolicitud";
-    protected $table = "solicituds";
+    protected $primaryKey = "codSolicitud";
+    protected $table = "solicitud";
+
+    protected $fillable = ['monto','motivo','fecha','estado','codUsuario','codSocio'];
 
     public $timestamps = false;
 }

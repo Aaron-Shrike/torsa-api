@@ -2,11 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Socio;
 use Illuminate\Http\Request;
-use App\Models\Tcargo;
-use App\Models\TipoCargo;
 
-class TcargoController extends Controller
+class SocioController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -15,9 +14,7 @@ class TcargoController extends Controller
      */
     public function index()
     {
-        $tcargos = TipoCargo::all();
-        return //\response($tcargos);
-        response()->json($tcargos, 200);
+        //
     }
 
     /**
@@ -28,13 +25,7 @@ class TcargoController extends Controller
      */
     public function store(Request $request)
     {
-        $request->validate([
-            'descripcion' => 'required'
-        ]);
-
-        $tcargos = TipoCargo::create($request->all());
-
-        return response()->json($tcargos,201);
+        //
     }
 
     /**
@@ -45,7 +36,7 @@ class TcargoController extends Controller
      */
     public function show($id)
     {
-        return TipoCargo::find($id);
+        //
     }
 
     /**
@@ -55,14 +46,9 @@ class TcargoController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-
-    //dd(request->all());
     public function update(Request $request, $id)
     {
-
-        $tcargo = TipoCargo::findOrFail($id)->update($request->all());
-
-        return response()->json($tcargo,200);
+        //
     }
 
     /**
@@ -73,8 +59,23 @@ class TcargoController extends Controller
      */
     public function destroy($id)
     {
-        $tcargo = TipoCargo::findOrFail($id);
-        $tcargo->delete();
-        return response()->json(null,204);
+        //
+    }
+
+    public function buscarSocioHabilitado($dni){
+
+        $consulta = Socio::select("nombre","apePaterno","apeMaterno","fecNacimiento",
+                "telefono","domicilio","tipo")
+                ->where("socio.dni",$dni)
+                //->where("socio.activo",1)
+                ->first();
+
+            if(isset($consulta['dni'])){
+                if ($consulta['activo']) {
+                    $consulta;
+                }
+            }
+
+            return response()->json($consulta,200);
     }
 }

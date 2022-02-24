@@ -10,14 +10,9 @@ class ContactoEmergencia extends Model
     use HasFactory;
 
     protected $primaryKey = "codConEmergencia";
-    protected $table = "cemergencias";
+    protected $table = "contactoemergencia";
 
     protected $fillable = ['nombre','numero','parentesco'];
-
-    //Relacion Uno a Muchos
-    public function trabajadors(){
-        return $this->hasMany('App\Models\Trabajador');
-    }
 
     public $timestamps = false;
 }
