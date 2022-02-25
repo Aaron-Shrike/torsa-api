@@ -3,9 +3,15 @@
 use App\Http\Controllers\TrabajadorController;
 use App\Http\Controllers\TipoCargoController;
 use App\Http\Controllers\UsuarioController;
+use App\Http\Controllers\SocioController;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers;
 use App\Http\Controllers\ContactoEmergenciaController;
 use App\Http\Controllers\TipoUsuarioController;
+use App\Models\ContactoEmergencia;
+use App\Models\TipoCargo;
+use App\Models\TipoUsuario;
 
 /*
 |--------------------------------------------------------------------------

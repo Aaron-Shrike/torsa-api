@@ -10,6 +10,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Crypt;
+use Illuminate\Support\Facades\Hash;
+use Symfony\Component\HttpKernel\Event\ResponseEvent;
 
 class UsuarioController extends Controller
 {
@@ -79,21 +81,23 @@ class UsuarioController extends Controller
                 'telefono'=>$request->get('telefono'),
                 'domicilio'=>$request->get('domicilio'),
                 'correo'=>$request->get('correo'), 
-            ]);
-            $trabajador->save();
+
+             ]);
+             $trabajador->save();
 
         //$request->validate([
 
         //]);
-            $usuario = new Usuario([
+             $usuario = new Usuario([
                 'codTipoUsuario'=>$request->get('codTipoUsuario'),
                 'codTrabajador'=>$trabajador->codTrabajador,
-                'dni'=>$request->get('dni'),
-                'contrasenia'=>Crypt::encryptString(Str::random(10)),
-                'activo'=>1,
-                //'secret' => Crypt::encryptString($request->secret)
-            ]);
-            $usuario->save();
+                 'dni'=>$request->get('dni'),
+                 'contrasenia'=>Crypt::encryptString(Str::random(10)),
+                 'activo'=>1,
+                 
+                 //'secret' => Crypt::encryptString($request->secret)
+             ]);
+             $usuario->save();
             
             $receivers = Trabajador::all('correo')->max('correo');
 
