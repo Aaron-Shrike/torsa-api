@@ -41,28 +41,28 @@ class UsuarioController extends Controller
 
     public function nuevo(Request $request){
 
-         $request->validate([
-             'nombreC'=>'required',
-             'numero'=>'required',
-             'parentesco'=>'required',
-             'nombreT'=>'required',
-             'apePaterno'=>'required',
-             'apeMaterno'=>'required',
-             'fecNacimiento'=>'required',
-             'telefono'=>'required',
-             'domicilio'=>'required',
-             'correo'=>'required|email',
-             'codTipoCargo'=>'required',
-             'dni'=>'required',
+        $request->validate([
+            'nombreC'=>'required',
+            'numero'=>'required',
+            'parentesco'=>'required',
+            'nombreT'=>'required',
+            'apePaterno'=>'required',
+            'apeMaterno'=>'required',
+            'fecNacimiento'=>'required',
+            'telefono'=>'required',
+            'domicilio'=>'required',
+            'correo'=>'required|email',
+            'codTipoCargo'=>'required',
+            'dni'=>'required',
             'activo'=>'required'
-         ]);
+        ]);
         $cemergencias = new ContactoEmergencia([
             'nombre'=>$request->get('nombreC'),
             'numero'=>$request->get('numero'),
             'parentesco'=>$request->get('parentesco')
         ]);
 
-         $cemergencias->save();
+        $cemergencias->save();
 
 
         // $request->validate([
@@ -79,27 +79,26 @@ class UsuarioController extends Controller
                 'codTipoCargo'=>$request->get('codTipoCargo'),
                 'codConEmergencia'=>$cemergencias->codConEmergencia
 
-             ]);
-             $trabajador->save();
+            ]);
+            $trabajador->save();
 
         //$request->validate([
 
         //]);
-             $usuario = new Usuario([
-                 'dni'=>$request->get('dni'),
-                 'contrasenia'=>Crypt::encryptString(Str::random(10)),
-                 'activo'=>1,
-                 'codTrabajador'=>$trabajador->codTrabajador,
-                 'codTipoUsuario'=>$request->get('codTipoUsuario'),
+            $usuario = new Usuario([
+                'dni'=>$request->get('dni'),
+                'contrasenia'=>Crypt::encryptString(Str::random(10)),
+                'activo'=>1,
+                'codTrabajador'=>$trabajador->codTrabajador,
+                'codTipoUsuario'=>$request->get('codTipoUsuario'),
                  //'secret' => Crypt::encryptString($request->secret)
-             ]);
-             $usuario->save();
+            ]);
+            $usuario->save();
             
-             $receivers = Trabajador::all('correo')->max('correo');
+            $receivers = Trabajador::all('correo')->max('correo');
 
-             Mail::to($receivers)->send(new TestMail($usuario));
-             return "Correo Electronico Enviado";
-             
+            Mail::to($receivers)->send(new TestMail($usuario));
+            return "Correo Electronico Enviado";
     }
 
     public function validarDNI(Request $request){
@@ -158,71 +157,78 @@ class UsuarioController extends Controller
         $data=array();
         try
         {
-        $request->validate([
-            'dni' => 'required',
-            'contrasenia' => 'required',
-        ]);
-        $consulta = Usuario::join('tusuarios','usuarios.codTipoUsuario','=','tusuarios.codTipoUsuario')
-                    ->select('usuarios.dni','usuarios.contrasenia','tusuarios.descripcion','usuarios.activo')
-                    ->where('usuarios.dni','=',$request->dni)
-                    ->first();
-        if(isset($consulta['dni']))
-        {
-            if($consulta['activo'])
-            {
-                if($consulta['contrasenia'] == $request->contrasenia)
-                {
-                    //if($consulta['descripcion'] == 'Promotor')
-                    //{
-                            $data = [
-                                'consulta' => $consulta,
-                            ];
-                    //}
-                    //else
-                    //{
-                      //      $mensaje = 'Usuario no es promotor';
+            $request->validate([
+                'dni' => 'required',
+                'contrasenia' => 'required',
+            ]);
 
-                        //    $data = [
-                          //      'error' => true,
-                            //    'mensaje' => $mensaje
-                            //];
-                    //}
-                }
-                else
+            $consulta = Usuario::join('tipousuario','usuario.codTipoUsuario','=','tipousuario.codTipoUsuario')
+                        ->join('trabajador','usuario.codTrabajador','=','trabajador.codTrabajador')
+                        ->select('usuario.dni','trabajador.nombre','trabajador.apePaterno','trabajador.apeMaterno','usuario.contrasenia','tipousuario.descripcion','usuario.activo')
+                        ->where('usuario.dni','=',$request->dni)
+                        ->first();
+
+            if(isset($consulta['dni']))
+            {
+                if($consulta['activo'])
                 {
+                    if($consulta['contrasenia'] == $request->contrasenia)
+                    {
+                        //if($consulta['descripcion'] == 'Promotor')
+                        //{
+                                $data = [
+                                    'dni' => $consulta['dni'],
+                                    'nombre' => $consulta['nombre'],
+                                    'apePaterno' => $consulta['apePaterno'],
+                                    'apeMaterno' => $consulta['apeMaterno'],
+                                    'tipoUsuario' => $consulta['descripcion'],
+                                ];
+                        //}
+                        //else
+                        //{
+                        //      $mensaje = 'Usuario no es promotor';
+
+                            //    $data = [
+                            //      'error' => true,
+                                //    'mensaje' => $mensaje
+                                //];
+                        //}
+                    }
+                    else
+                    {
                         $mensaje = 'Contraseña no coincide con el usuario';
 
                         $data = [
                             'error' => true,
                             'mensaje' => $mensaje
                         ];
+                    }
+                }
+                else
+                {
+                    $mensaje = 'Cuenta inactiva no podrá iniciar sesión';
+
+                    $data = [
+                        'error' => true,
+                        'mensaje' => $mensaje
+                    ];
                 }
             }
             else
             {
-                $mensaje = 'Cuenta inactiva no podrá iniciar sesión';
+                $mensaje = 'El dni no se encuentra registrado como usuario';
 
                 $data = [
                     'error' => true,
                     'mensaje' => $mensaje
                 ];
             }
+            return response($data);
         }
-        else
+        catch (\Exception $ex)
         {
-            $mensaje = 'El dni no se encuentra registrado como usuario';
-
-            $data = [
-                'error' => true,
-                'mensaje' => $mensaje
-            ];
+            $data = $ex->getMessage();
+            return response($data, 400);
         }
-        return response($data);
-    }
-    catch (\Exception $ex)
-    {
-        $data = $ex->getMessage();
-        return response($data, 400);
-    }
     }
 }

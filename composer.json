@@ -11,10 +11,7 @@
         "guzzlehttp/guzzle": "^7.0.1",
         "laravel/framework": "^8.75",
         "laravel/sanctum": "^2.11",
-        "laravel/tinker": "^2.5",
-        "symfony/http-client": "^6.0",
-        "symfony/mailgun-mailer": "^6.0",
-        "symfony/postmark-mailer": "^6.0"
+        "laravel/tinker": "^2.5"
     },
     "require-dev": {
         "facade/ignition": "^2.5",

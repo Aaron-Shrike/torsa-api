@@ -26,7 +26,7 @@ class UsuarioSeeder extends Seeder
         $usuario->dni = "12345672";
         $usuario->contrasenia = "1234";
         $usuario->activo = '1';
-        $usuario->codTrabajador = "1";
+        $usuario->codTrabajador = "2";
         $usuario->codTipoUsuario = "4";
         $usuario->save();
     }
