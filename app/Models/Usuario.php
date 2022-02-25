@@ -11,9 +11,9 @@ class Usuario extends Model
 
     protected $primaryKey = "codUsuario";
     protected $table = "usuario";
-    protected $fillable = ['dni','activo','codTrabajador','codTipoUsuario'];
+    protected $fillable = ['dni','activo','contrasenia','codTrabajador','codTipoUsuario'];
 
-    protected $hidden = ['contrasenia'];
+    protected $hidden = [];
 
     public $timestamps = false;
 
