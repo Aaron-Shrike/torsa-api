@@ -62,9 +62,9 @@ class UsuarioController extends Controller
             'dni'=>'required',
             'activo'=>'required'
         ]);
-        //try{
-         //   DB::beginTransaction();
-
+        DB::beginTransaction();
+        try {
+            //CREAMOS EL CONTACTO DE EMERGENCIA
             $cemergencias = new ContactoEmergencia([
                 'nombre'=>$request->get('nombreC'),
                 'numero'=>$request->get('numero'),
@@ -73,50 +73,43 @@ class UsuarioController extends Controller
     
             $cemergencias->save();
     
+            //CREAMOS EL TRABAJADOR
+            $trabajador = new Trabajador([
+                'codConEmergencia'=>$cemergencias->codConEmergencia,
+                'codTipoCargo'=>$request->get('codTipoCargo'), 
+                'nombre'=>$request->get('nombreT'),
+                'apePaterno'=>$request->get('apePaterno'),
+                'apeMaterno'=>$request->get('apeMaterno'),
+                'fecNacimiento'=>$request->get('fecNacimiento'),
+                'telefono'=>$request->get('telefono'),
+                'domicilio'=>$request->get('domicilio'),
+                'correo'=>$request->get('correo'), 
     
-            // $request->validate([
+            ]);
+            $trabajador->save();
     
-            //]);
-                $trabajador = new Trabajador([
-                    'codConEmergencia'=>$cemergencias->codConEmergencia,
-                    'codTipoCargo'=>$request->get('codTipoCargo'), 
-                    'nombre'=>$request->get('nombreT'),
-                    'apePaterno'=>$request->get('apePaterno'),
-                    'apeMaterno'=>$request->get('apeMaterno'),
-                    'fecNacimiento'=>$request->get('fecNacimiento'),
-                    'telefono'=>$request->get('telefono'),
-                    'domicilio'=>$request->get('domicilio'),
-                    'correo'=>$request->get('correo'), 
-    
-                 ]);
-                 $trabajador->save();
-    
-            //$request->validate([
-    
-            //]);
-                 $usuario = new Usuario([
-                    'codTipoUsuario'=>$request->get('codTipoUsuario'),
-                    'codTrabajador'=>$trabajador->codTrabajador,
-                     'dni'=>$request->get('dni'),
-                     'contrasenia'=>Hash::make($alt),
-                     'activo'=>1,
-                     
-                     //'secret' => Crypt::encryptString($request->secret)
-                 ]);
-                 $usuario->save();
+           //CREAMOS EL USUARIO
+            $usuario = new Usuario([
+                'codTipoUsuario'=>$request->get('codTipoUsuario'),
+                'codTrabajador'=>$trabajador->codTrabajador,
+                'dni'=>$request->get('dni'),
+                'contrasenia'=>Hash::make($alt),
+                'activo'=>1,
 
-                 $receivers = Trabajador::all('correo')->max('correo');
-
-                 Mail::to($receivers)->send(new TestMail($alt));
-                 return "Correo Electronico Enviado";
+            ]);
+            $usuario->save();
+            DB::commit();
                  
-                 //DB::commit();
+            $receivers = Trabajador::all('correo')->max('correo');
 
-        //}catch(Exception $ex){
-          //  DB::rollBack();
-        //}
+            Mail::to($receivers)->send(new TestMail($alt));
+            return "Correo Electronico Enviado";
         
-            
+        } catch (\Exception $e) {
+        DB::rollback();
+        return $e->getMessage();
+        }
+          
            
     }
 
