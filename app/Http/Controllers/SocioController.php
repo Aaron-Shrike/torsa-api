@@ -34,9 +34,18 @@ class SocioController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show($dni)
     {
-        //
+        $socio = Socio::select("socio.codSocio","socio.dni","socio.nombre","socio.apePaterno","socio.apeMaterno",
+        "socio.fecNacimiento","socio.telefono","socio.domicilio","socio.tipo")
+        ->where([
+            "socio.dni"=>$dni,
+            "socio.activo"=>"1"
+            ])
+        ->first();
+
+    
+        return response()->json($socio,200);
     }
 
     /**
@@ -64,18 +73,19 @@ class SocioController extends Controller
 
     public function buscarSocioHabilitado($dni){
 
-        $consulta = Socio::select("nombre","apePaterno","apeMaterno","fecNacimiento",
-                "telefono","domicilio","tipo")
-                ->where("socio.dni",$dni)
-                //->where("socio.activo",1)
+        //dd(request()->all());
+
+        $socio = Socio::select("socio.codSocio","socio.dni","socio.nombre","socio.apePaterno","socio.apeMaterno",
+                "socio.fecNacimiento","socio.telefono","socio.domicilio","socio.tipo")
+                ->where([
+                    "socio.dni"=>$dni,
+                    "socio.activo"=>"1"
+                    ])
                 ->first();
 
-            if(isset($consulta['dni'])){
-                if ($consulta['activo']) {
-                    $consulta;
-                }
-            }
-
-            return response()->json($consulta,200);
+            
+                return response()->json($socio,200);
+                
+            
     }
 }

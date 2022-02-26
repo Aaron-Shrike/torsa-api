@@ -44,7 +44,11 @@ Route::apiResource('contactoemergencias',ContactoEmergenciaController::class);
 
 Route::apiResource('trabajador',TrabajadorController::class);
 
+Route::apiResource('socio',SocioController::class);
+
 Route::post('nuevo', 'App\Http\Controllers\UsuarioController@nuevo');
 Route::post('validarDNI', 'App\Http\Controllers\UsuarioController@validarDNI');
 Route::post('validarEmail', 'App\Http\Controllers\UsuarioController@validarEmail');
-//Route::get('buscarSocioHabilitado','App\Http\Controller\SocioController@buscarSocioHabilitado');
+Route::get('buscarSocioHabilitado/{dni}', 'App\Http\Controllers\SocioController@buscarSocioHabilitado');
+Route::post('registrarSolicitud','App\Http\Controllers\SolicitudController@registrarSolicitud');
+Route::get('listarSolicitudesDia','App\Http\Controllers\SolicitudController@listarSolicitudesDia');

@@ -23,8 +23,9 @@ class TestMail extends Mailable
     public function __construct($dates)
     {
     
-        $this->date = $dates['contrasenia'];
-        $this -> date = Crypt::decryptString($dates['contrasenia']);
+        $this->date =  $dates;
+        //$this->date = $dates['contrasenia'];
+        //$this -> date = Crypt::decryptString($dates['contrasenia']);
     }
 
     /**

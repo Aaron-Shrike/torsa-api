@@ -15,8 +15,8 @@ class TipocargoController extends Controller
     public function index()
     {
         $tcargos = TipoCargo::all();
-        return //\response($tcargos);
-        response()->json($tcargos, 200);
+        return \response($tcargos);
+        //response()->json($tcargos, 200);
     }
 
     /**

@@ -6,12 +6,14 @@ use App\Mail\TestMail;
 use App\Models\Usuario;
 use App\Models\ContactoEmergencia;
 use App\Models\Trabajador;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Hash;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
+use Illuminate\Support\Facades\DB;
 
 class UsuarioController extends Controller
 {
@@ -43,6 +45,7 @@ class UsuarioController extends Controller
 
     public function nuevo(Request $request){
         //dd(request()->all());
+        $alt = Str::random(10);
 
         $request->validate([
             'nombreC'=>'required',
@@ -59,50 +62,62 @@ class UsuarioController extends Controller
             'dni'=>'required',
             'activo'=>'required'
         ]);
-        $cemergencias = new ContactoEmergencia([
-            'nombre'=>$request->get('nombreC'),
-            'numero'=>$request->get('numero'),
-            'parentesco'=>$request->get('parentesco')
-        ]);
+        try{
+            DB::beginTransaction();
 
-        $cemergencias->save();
+            $cemergencias = new ContactoEmergencia([
+                'nombre'=>$request->get('nombreC'),
+                'numero'=>$request->get('numero'),
+                'parentesco'=>$request->get('parentesco')
+            ]);
+    
+            $cemergencias->save();
+    
+    
+            // $request->validate([
+    
+            //]);
+                $trabajador = new Trabajador([
+                    'codConEmergencia'=>$cemergencias->codConEmergencia,
+                    'codTipoCargo'=>$request->get('codTipoCargo'), 
+                    'nombre'=>$request->get('nombreT'),
+                    'apePaterno'=>$request->get('apePaterno'),
+                    'apeMaterno'=>$request->get('apeMaterno'),
+                    'fecNacimiento'=>$request->get('fecNacimiento'),
+                    'telefono'=>$request->get('telefono'),
+                    'domicilio'=>$request->get('domicilio'),
+                    'correo'=>$request->get('correo'), 
+    
+                 ]);
+                 $trabajador->save();
+    
+            //$request->validate([
+    
+            //]);
+                 $usuario = new Usuario([
+                    'codTipoUsuario'=>$request->get('codTipoUsuario'),
+                    'codTrabajador'=>$trabajador->codTrabajador,
+                     'dni'=>$request->get('dni'),
+                     'contrasenia'=>Hash::make($alt),
+                     'activo'=>1,
+                     
+                     //'secret' => Crypt::encryptString($request->secret)
+                 ]);
+                 $usuario->save();
 
+                 $receivers = Trabajador::all('correo')->max('correo');
 
-        // $request->validate([
-
-        //]);
-            $trabajador = new Trabajador([
-                'codConEmergencia'=>$cemergencias->codConEmergencia,
-                'codTipoCargo'=>$request->get('codTipoCargo'), 
-                'nombre'=>$request->get('nombreT'),
-                'apePaterno'=>$request->get('apePaterno'),
-                'apeMaterno'=>$request->get('apeMaterno'),
-                'fecNacimiento'=>$request->get('fecNacimiento'),
-                'telefono'=>$request->get('telefono'),
-                'domicilio'=>$request->get('domicilio'),
-                'correo'=>$request->get('correo'), 
-
-             ]);
-             $trabajador->save();
-
-        //$request->validate([
-
-        //]);
-             $usuario = new Usuario([
-                'codTipoUsuario'=>$request->get('codTipoUsuario'),
-                'codTrabajador'=>$trabajador->codTrabajador,
-                 'dni'=>$request->get('dni'),
-                 'contrasenia'=>Crypt::encryptString(Str::random(10)),
-                 'activo'=>1,
+                 Mail::to($receivers)->send(new TestMail($alt));
+                 return "Correo Electronico Enviado";
                  
-                 //'secret' => Crypt::encryptString($request->secret)
-             ]);
-             $usuario->save();
-            
-            $receivers = Trabajador::all('correo')->max('correo');
+                 DB::commit();
 
-            Mail::to($receivers)->send(new TestMail($usuario));
-            return "Correo Electronico Enviado";
+        }catch(Exception $ex){
+            DB::rollBack();
+        }
+        
+            
+           
     }
 
     public function validarDNI(Request $request){
@@ -158,59 +173,47 @@ class UsuarioController extends Controller
 
     public function IniciarSesion(Request $request)
     {
-        $data=array();
-        try
-        {
+            $data=array();
+            try
+            {
             $request->validate([
                 'dni' => 'required',
                 'contrasenia' => 'required',
             ]);
-
-            $consulta = Usuario::join('tipousuario','usuario.codTipoUsuario','=','tipousuario.codTipoUsuario')
-                        ->join('trabajador','usuario.codTrabajador','=','trabajador.codTrabajador')
-                        ->select('usuario.dni','trabajador.nombre','trabajador.apePaterno','trabajador.apeMaterno','usuario.contrasenia','tipousuario.descripcion','usuario.activo')
+            $consulta = Usuario::join('tipousuario','usuario.codTipoUsuario','=','tipousuario.codTipoUsuario') 
+                        -> join('trabajador','usuario.codTrabajador','=','trabajador.codTrabajador') 
+                        ->select('usuario.codUsuario','usuario.dni','usuario.contrasenia','tipousuario.descripcion','usuario.activo','trabajador.nombre','trabajador.apePaterno','trabajador.apeMaterno')
                         ->where('usuario.dni','=',$request->dni)
                         ->first();
-
             if(isset($consulta['dni']))
             {
                 if($consulta['activo'])
-                {
-                    if($consulta['contrasenia'] == $request->contrasenia)
+                {   
+                    if(Hash::check($request->contrasenia, $consulta['contrasenia']))
                     {
-                        //if($consulta['descripcion'] == 'Promotor')
-                        //{
-                                $data = [
+                        $data = [
                                     'dni' => $consulta['dni'],
-                                    'nombre' => $consulta['nombre'],
-                                    'apePaterno' => $consulta['apePaterno'],
-                                    'apeMaterno' => $consulta['apeMaterno'],
+                                    'codigo' => $consulta['codUsuario'],
                                     'tipoUsuario' => $consulta['descripcion'],
+                                    'nombre'=> $consulta['nombre'],
+                                    'apePaterno'=> $consulta['apePaterno'],
+                                    'apeMaterno'=> $consulta['apeMaterno'],
                                 ];
-                        //}
-                        //else
-                        //{
-                        //      $mensaje = 'Usuario no es promotor';
-
-                            //    $data = [
-                            //      'error' => true,
-                                //    'mensaje' => $mensaje
-                                //];
-                        //}
-                    }
+                    
+                    }   
                     else
                     {
-                        $mensaje = 'Contraseña no coincide con el usuario';
-
-                        $data = [
-                            'error' => true,
-                            'mensaje' => $mensaje
-                        ];
+                            $mensaje = 'Contraseña no válida';
+        
+                            $data = [
+                                'error' => true,
+                                'mensaje' => $mensaje
+                            ];
                     }
                 }
                 else
                 {
-                    $mensaje = 'Cuenta inactiva no podrá iniciar sesión';
+                    $mensaje = 'Cuenta inactiva';
 
                     $data = [
                         'error' => true,
@@ -220,7 +223,7 @@ class UsuarioController extends Controller
             }
             else
             {
-                $mensaje = 'El dni no se encuentra registrado como usuario';
+                $mensaje = 'El DNI no se encuentra registrado como usuario';
 
                 $data = [
                     'error' => true,
@@ -229,7 +232,7 @@ class UsuarioController extends Controller
             }
             return response($data);
         }
-        catch (\Exception $ex)
+        catch (\Exception $ex) 
         {
             $data = $ex->getMessage();
             return response($data, 400);
