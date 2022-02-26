@@ -62,8 +62,8 @@ class UsuarioController extends Controller
             'dni'=>'required',
             'activo'=>'required'
         ]);
-        try{
-            DB::beginTransaction();
+        //try{
+         //   DB::beginTransaction();
 
             $cemergencias = new ContactoEmergencia([
                 'nombre'=>$request->get('nombreC'),
@@ -110,11 +110,11 @@ class UsuarioController extends Controller
                  Mail::to($receivers)->send(new TestMail($alt));
                  return "Correo Electronico Enviado";
                  
-                 DB::commit();
+                 //DB::commit();
 
-        }catch(Exception $ex){
-            DB::rollBack();
-        }
+        //}catch(Exception $ex){
+          //  DB::rollBack();
+        //}
         
             
            
