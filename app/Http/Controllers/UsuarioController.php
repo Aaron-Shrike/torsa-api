@@ -192,7 +192,7 @@ class UsuarioController extends Controller
                                     'apePaterno'=> $consulta['apePaterno'],
                                     'apeMaterno'=> $consulta['apeMaterno'],
                                 ];
-                    
+                                
                     }   
                     else
                     {

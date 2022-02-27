@@ -6,6 +6,8 @@ use Illuminate\Http\Request;
 use App\Models\GaranteSolicitud;
 use App\Models\Socio;
 use App\Models\Solicitud;
+use App\Models\Usuario;
+use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
 
 class SolicitudController extends Controller
@@ -70,13 +72,18 @@ class SolicitudController extends Controller
 
     public function listarSolicitudesDia(){
         //dd(request()->all());
+
         $fechaDeHoy = Carbon::today()->format('Y-m-d');
+
+        //$codigo = Auth::codUsuario();
+        $codigo = auth()->user()->codUsuario;
         
         $solicitudesDia = Solicitud::select('solicitud.codSolicitud','solicitud.codUsuario',
                         'solicitud.codSocio','solicitud.monto','solicitud.motivo','solicitud.fecha','solicitud.estado')
                         ->join("usuario","usuario.codUsuario","solicitud.codUsuario")
                         ->join("socio","socio.codSocio","solicitud.codSocio")
                         ->where([
+                            'solicitud.codUsuario'=>$codigo,
                             'solicitud.fecha'=>$fechaDeHoy,
                             'solicitud.estado'=>"1"
                             ])
