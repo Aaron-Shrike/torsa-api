@@ -14,8 +14,8 @@ class CreateTipocargoTable extends Migration
     public function up()
     {
         Schema::create('tipocargo', function (Blueprint $table) {
-            $table->bigIncrements('codTipoCargo');
-            $table->string('descripcion',40);
+            $table->increments('codTipoCargo');
+            $table->string('descripcion',22);
             $table->timestamps();
         });
     }

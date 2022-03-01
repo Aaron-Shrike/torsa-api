@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers;
 use App\Http\Controllers\ContactoEmergenciaController;
+use App\Http\Controllers\SolicitudController;
 use App\Http\Controllers\TipoUsuarioController;
 use App\Models\ContactoEmergencia;
 use App\Models\TipoCargo;
@@ -24,13 +25,17 @@ use App\Models\TipoUsuario;
 |
 */
 
+//Ruta de ejemplo, necesita autenticacion
 // Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 //     return $request->user();
 // });
 
 //Rutas API
+
+//Ruta para iniciar sesion
 Route::post('/iniciar-sesion', [UsuarioController::class, 'IniciarSesion']);
 Route::post('/cerrar-sesion', [UsuarioController::class, 'CerrarSesion']);
+Route::get('/obtener-cargos', [TipoCargoController::class, 'ObtenerCargos']);
 
 Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('/registrar-trabajador', [TrabajadorController::class, 'store']);
@@ -38,6 +43,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
 });
 
 Route::apiResource('tipocargo',TipoCargoController::class);
+
 Route::apiResource('tipousuario',TipoUsuarioController::class);
 
 Route::apiResource('contactoemergencias',ContactoEmergenciaController::class);

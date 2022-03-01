@@ -71,10 +71,9 @@ class SocioController extends Controller
         //
     }
 
-    public function buscarSocioHabilitado($dni){
-
+    public function buscarSocioHabilitado($dni)
+    {
         //dd(request()->all());
-
         $socio = Socio::select("socio.codSocio","socio.dni","socio.nombre","socio.apePaterno","socio.apeMaterno",
                 "socio.fecNacimiento","socio.telefono","socio.domicilio","socio.tipo")
                 ->where([
@@ -84,8 +83,6 @@ class SocioController extends Controller
                 ->first();
 
             
-                return response()->json($socio,200);
-                
-            
+        return response()->json($socio,200);
     }
 }

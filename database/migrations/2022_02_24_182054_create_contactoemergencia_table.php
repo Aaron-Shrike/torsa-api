@@ -14,7 +14,7 @@ class CreateContactoemergenciaTable extends Migration
     public function up()
     {
         Schema::create('contactoemergencia', function (Blueprint $table) {
-            $table->bigIncrements('codConEmergencia');
+            $table->increments('codConEmergencia');
             $table->string('nombre',50);
             $table->char('numero',9)->unique();
             $table->string('parentesco',20);

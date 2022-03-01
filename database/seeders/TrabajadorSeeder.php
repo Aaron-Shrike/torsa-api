@@ -14,6 +14,7 @@ class TrabajadorSeeder extends Seeder
      */
     public function run()
     {
+        // Trabajador Juan
         $trabajador = new Trabajador();
         $trabajador->nombre = "Juan";
         $trabajador->apePaterno = "ApePJuan";
@@ -25,7 +26,7 @@ class TrabajadorSeeder extends Seeder
         $trabajador->codTipoCargo = "1";
         $trabajador->codConEmergencia = "1";
         $trabajador->save();
-        
+        // Trabajador Manuel
         $trabajador = new Trabajador();
         $trabajador->nombre = "Manuel";
         $trabajador->apePaterno = "ApePManuel";
@@ -34,8 +35,20 @@ class TrabajadorSeeder extends Seeder
         $trabajador->telefono = "123456782";
         $trabajador->domicilio = "asdasd domicilio manuel";
         $trabajador->correo = "manuel@my.com";
-        $trabajador->codTipoCargo = "1";
-        $trabajador->codConEmergencia = "1";
+        $trabajador->codTipoCargo = "2";
+        $trabajador->codConEmergencia = "2";
+        $trabajador->save();
+        // Trabajador Manuel
+        $trabajador = new Trabajador();
+        $trabajador->nombre = "Nami";
+        $trabajador->apePaterno = "ApePNami";
+        $trabajador->apeMaterno = 'ApeMNami';
+        $trabajador->fecNacimiento = "1999-09-18";
+        $trabajador->telefono = "123456783";
+        $trabajador->domicilio = "asdasd domicilio nami";
+        $trabajador->correo = "nami@my.com";
+        $trabajador->codTipoCargo = "3";
+        $trabajador->codConEmergencia = "3";
         $trabajador->save();
     }
 }

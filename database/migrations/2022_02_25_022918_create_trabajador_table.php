@@ -14,7 +14,7 @@ class CreateTrabajadorTable extends Migration
     public function up()
     {
         Schema::create('trabajador', function (Blueprint $table) {
-            $table->bigIncrements('codTrabajador');
+            $table->increments('codTrabajador');
             $table->string('nombre',50);
             $table->string('apePaterno',50);
             $table->string('apeMaterno',50);
@@ -22,8 +22,8 @@ class CreateTrabajadorTable extends Migration
             $table->char('telefono',9);
             $table->string('domicilio',100);
             $table->string('correo',60)->unique();
-            $table->unsignedBigInteger('codTipoCargo')->nullable();
-            $table->unsignedBigInteger('codConEmergencia')->nullable();
+            $table->unsignedInteger('codTipoCargo');
+            $table->unsignedInteger('codConEmergencia');
 
             $table->foreign('codTipoCargo')
             ->references('codTipoCargo')

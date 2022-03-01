@@ -14,12 +14,12 @@ class CreateUsuarioTable extends Migration
     public function up()
     {
         Schema::create('usuario', function (Blueprint $table) {
-            $table->bigIncrements('codUsuario');
+            $table->increments('codUsuario');
             $table->char('dni', 8)->unique();
-            $table->string('contrasenia', 30);
+            $table->string('contrasenia', 60);
             $table->boolean('activo');
-            $table->unsignedBigInteger('codTrabajador')->unique()->nullable();
-            $table->unsignedBigInteger('codTipoUsuario')->nullable();
+            $table->unsignedInteger('codTrabajador')->unique()->nullable();
+            $table->unsignedInteger('codTipoUsuario')->nullable();
 
             $table->foreign('codTrabajador')
             ->references('codTrabajador')

@@ -18,6 +18,12 @@ class TipocargoController extends Controller
         return \response($tcargos);
         //response()->json($tcargos, 200);
     }
+    public function ObtenerCargos()
+    {
+        $tcargos = TipoCargo::all();
+        return //\response($tcargos);
+        response()->json($tcargos, 200);
+    }
 
     /**
      * Store a newly created resource in storage.

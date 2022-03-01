@@ -6,17 +6,87 @@ use App\Mail\TestMail;
 use App\Models\Usuario;
 use App\Models\ContactoEmergencia;
 use App\Models\Trabajador;
-use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Hash;
-use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Illuminate\Support\Facades\DB;
 
 class UsuarioController extends Controller
 {
+    //Inicio de sesion
+    public function IniciarSesion(Request $request)
+    {
+        $data=array();
+        try
+        {
+            $request->validate([
+                'dni' => 'required',
+                'contrasenia' => 'required',
+            ]);
+
+            $consulta = Usuario::join('tipousuario','usuario.codTipoUsuario','=','tipousuario.codTipoUsuario') 
+                        -> join('trabajador','usuario.codTrabajador','=','trabajador.codTrabajador') 
+                        ->select('usuario.codUsuario','usuario.dni','usuario.contrasenia','tipousuario.descripcion','usuario.activo','trabajador.nombre','trabajador.apePaterno','trabajador.apeMaterno')
+                        ->where('usuario.dni','=',$request->dni)
+                        ->first();
+
+            if(isset($consulta['dni']))
+            {
+                if($consulta['activo'])
+                {   
+                    if(Hash::check($request->contrasenia, $consulta['contrasenia']))
+                    {
+                        $data = [
+                            'dni' => $consulta['dni'],
+                            'codigo' => $consulta['codUsuario'],
+                            'tipoUsuario' => $consulta['descripcion'],
+                            'nombre'=> $consulta['nombre'],
+                            'apePaterno'=> $consulta['apePaterno'],
+                            'apeMaterno'=> $consulta['apeMaterno'],
+                        ];
+                    
+                    }   
+                    else
+                    {
+                        $mensaje = 'Contraseña no válida';
+    
+                        $data = [
+                            'error' => true,
+                            'mensaje' => $mensaje
+                        ];
+                    }
+                }
+                else
+                {
+                    $mensaje = 'Cuenta inactiva';
+
+                    $data = [
+                        'error' => true,
+                        'mensaje' => $mensaje
+                    ];
+                }
+            }
+            else
+            {
+                $mensaje = 'El DNI no se encuentra registrado como usuario';
+
+                $data = [
+                    'error' => true,
+                    'mensaje' => $mensaje
+                ];
+            }
+            
+            return response($data);
+        }
+        catch (\Exception $ex) 
+        {
+            $data = $ex->getMessage();
+            
+            return response($data, 400);
+        }
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -24,8 +94,7 @@ class UsuarioController extends Controller
      */
     public function index()
     {
-        
-            $manuales = Usuario::select("manual.codmanual", "manual.nombre", "pdf", "video", "manual.descripcion")
+        $manuales = Usuario::select("manual.codmanual", "manual.nombre", "pdf", "video", "manual.descripcion")
                 ->join("manual_empresa", "manual.codmanual", "manual_empresa.codmanual")
                 ->get();
 
@@ -88,7 +157,7 @@ class UsuarioController extends Controller
             ]);
             $trabajador->save();
     
-           //CREAMOS EL USUARIO
+            //CREAMOS EL USUARIO
             $usuario = new Usuario([
                 'codTipoUsuario'=>$request->get('codTipoUsuario'),
                 'codTrabajador'=>$trabajador->codTrabajador,
@@ -99,25 +168,23 @@ class UsuarioController extends Controller
             ]);
             $usuario->save();
             DB::commit();
-                 
+
             $receivers = Trabajador::all('correo')->max('correo');
 
             Mail::to($receivers)->send(new TestMail($alt));
             return "Correo Electronico Enviado";
         
         } catch (\Exception $e) {
-        DB::rollback();
-        return $e->getMessage();
+            DB::rollback();
+            return $e->getMessage();
         }
-          
-           
     }
 
     public function validarDNI(Request $request){
         $request->validate([
             'dni'=>'required'
         ]);
-        $consulta = Usuario::where('usuarios.dni','=',$request->dni)
+        $consulta = Usuario::where('usuario.dni','=',$request->dni)
             ->count();
         return response()->json($consulta, 200);
     }
@@ -126,109 +193,8 @@ class UsuarioController extends Controller
         $request->validate([
             'correo'=>'required'
         ]);
-        $consulta = Trabajador::where('trabajadors.correo','=',$request->correo)
+        $consulta = Trabajador::where('trabajador.correo','=',$request->correo)
             ->count();
         return response()->json($consulta, 200);
-    }
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show($id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy($id)
-    {
-        //
-    }
-
-    public function IniciarSesion(Request $request)
-    {
-            $data=array();
-            try
-            {
-            $request->validate([
-                'dni' => 'required',
-                'contrasenia' => 'required',
-            ]);
-            $consulta = Usuario::join('tipousuario','usuario.codTipoUsuario','=','tipousuario.codTipoUsuario') 
-                        -> join('trabajador','usuario.codTrabajador','=','trabajador.codTrabajador') 
-                        ->select('usuario.codUsuario','usuario.dni','usuario.contrasenia','tipousuario.descripcion','usuario.activo','trabajador.nombre','trabajador.apePaterno','trabajador.apeMaterno')
-                        ->where('usuario.dni','=',$request->dni)
-                        ->first();
-            if(isset($consulta['dni']))
-            {
-                if($consulta['activo'])
-                {   
-                    if(Hash::check($request->contrasenia, $consulta['contrasenia']))
-                    {
-                        $data = [
-                                    'dni' => $consulta['dni'],
-                                    'codigo' => $consulta['codUsuario'],
-                                    'tipoUsuario' => $consulta['descripcion'],
-                                    'nombre'=> $consulta['nombre'],
-                                    'apePaterno'=> $consulta['apePaterno'],
-                                    'apeMaterno'=> $consulta['apeMaterno'],
-                                ];
-                    
-                    }   
-                    else
-                    {
-                            $mensaje = 'Contraseña no válida';
-        
-                            $data = [
-                                'error' => true,
-                                'mensaje' => $mensaje
-                            ];
-                    }
-                }
-                else
-                {
-                    $mensaje = 'Cuenta inactiva';
-
-                    $data = [
-                        'error' => true,
-                        'mensaje' => $mensaje
-                    ];
-                }
-            }
-            else
-            {
-                $mensaje = 'El DNI no se encuentra registrado como usuario';
-
-                $data = [
-                    'error' => true,
-                    'mensaje' => $mensaje
-                ];
-            }
-            return response($data);
-        }
-        catch (\Exception $ex) 
-        {
-            $data = $ex->getMessage();
-            return response($data, 400);
-        }
     }
 }

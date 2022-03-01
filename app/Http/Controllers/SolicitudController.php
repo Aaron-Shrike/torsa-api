@@ -82,8 +82,7 @@ class SolicitudController extends Controller
                             ])
                             ->get();
 
-                            return response()->json($solicitudesDia,200);
-        
+        return response()->json($solicitudesDia,200);
     }
 
     public function registrarSolicitud(Request $request){
@@ -136,10 +135,10 @@ class SolicitudController extends Controller
             //'fecha'=>Carbon::now(),//no lo he probado
             'fecha'=>$request->get('fechaS'),
             'estado'=>'PVC'
-         ]);
-         $solicitud->save();
-           
-         $garanteUno = new Socio([
+        ]);
+        $solicitud->save();
+
+        $garanteUno = new Socio([
             'dni'=>$request->get('dniG1'),
             'nombre'=>$request->get('nombreG1'),
             'apePaterno'=>$request->get('apePaternoG1'),
@@ -153,12 +152,12 @@ class SolicitudController extends Controller
         $garanteUno->save();
 
         $garanteSolicitudUno = new GaranteSolicitud([
-           
+
             'codSolicitud'=>$solicitud->codSolicitud,
             'codSocio'=>$garanteUno->codSocio
-         ]);
+        ]);
         $garanteSolicitudUno->save();
-       
+
         $garanteDos = new Socio([
             'dni'=>$request->get('dniG2'),
             'nombre'=>$request->get('nombreG2'),
@@ -173,10 +172,10 @@ class SolicitudController extends Controller
         $garanteDos->save();
         
         $garanteSolicitudDos = new GaranteSolicitud([
-           
+
             'codSolicitud'=>$solicitud->codSolicitud,
             'codSocio'=>$garanteDos->codSocio
-         ]);
-         $garanteSolicitudDos->save();
+        ]);
+        $garanteSolicitudDos->save();
     }
 }
