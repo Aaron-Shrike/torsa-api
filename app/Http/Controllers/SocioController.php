@@ -101,16 +101,17 @@ class SocioController extends Controller
     {
         //
     }
-    public function buscarSocioGaranteHabilitado($dni)
+    public function BuscarSocioGaranteHabilitado($dni)
     {
         try
         {
             $data=array();
-            $error = [
+            $error = 
+            [
                 'error' => true,
                 'mensaje' => ""
             ];
-
+            //Busca socio por el dni
             $socio = Socio::select("socio.codSocio","socio.dni","socio.nombre","socio.apePaterno","socio.apeMaterno",
                     "socio.fecNacimiento","socio.telefono","socio.domicilio","socio.tipo")
                     ->where([
@@ -121,7 +122,8 @@ class SocioController extends Controller
 
             if(isset($socio['dni']))
             {  
-                $data = [
+                $data = 
+                [
                     'codSocio' => $socio['codSocio'],
                     'dni' => $socio['dni'],
                     'nombre'=> $socio['nombre'],
@@ -132,7 +134,7 @@ class SocioController extends Controller
                     'domicilio'=> $socio['domicilio'],
                     'tipo'=> $socio['tipo'],
                 ]; 
-
+                //Busca codigo socio en la tabla solicitud
                 $verificaSocio = Socio::select('solicitud.estado','socio.codSocio')
                         ->join('solicitud','solicitud.codSocio','socio.codSocio')
                         ->where('socio.codSocio','=',$socio['codSocio'])
@@ -142,6 +144,7 @@ class SocioController extends Controller
                 {   
                     if($verificaSocio['estado']=='REC' or $verificaSocio['estado']=='ANU')
                     {
+                        //Busca codigo del socio en la tabla garantesolicitud
                         $verificaGarante = GaranteSolicitud::select('solicitud.estado','garantesolicitud.codSocio')
                             ->join('solicitud','solicitud.codSolicitud','garantesolicitud.codSolicitud')
                             ->join('socio','socio.codSocio','garantesolicitud.codSocio')
@@ -160,6 +163,10 @@ class SocioController extends Controller
                                 return response($error);
                             }           
                         }
+                        else
+                        {
+                            return response($data);
+                        }
                     }
                     else
                     {
@@ -169,6 +176,7 @@ class SocioController extends Controller
                 }
                 else
                 {
+                    //Busca codigo del socio en la tabla garantesolicitud
                     $verificaGarante = GaranteSolicitud::select('solicitud.estado','garantesolicitud.codSocio')
                     ->join('solicitud','solicitud.codSolicitud','garantesolicitud.codSolicitud')
                     ->join('socio','socio.codSocio','garantesolicitud.codSocio')
@@ -195,7 +203,7 @@ class SocioController extends Controller
             }
             else
             {
-                $error['mensaje'] = "Ingrese nuevo garante.";
+                $error['mensaje'] = "Ingrese nuevo garante o socio";
 
                 return response($error);
             }
@@ -205,46 +213,6 @@ class SocioController extends Controller
             $mensaje = $e->getMessage();
 
             return response($mensaje, 500);
-        }
-    }
-    public function validarSocioSolicitudPendiente($codSocio)
-    {
-        $verificaSocio = Socio::select('solicitud.estado','socio.codSocio')
-        ->join('solicitud','solicitud.codSocio','socio.codSocio')
-        ->where('socio.codSocio','=',$codSocio)
-        ->orderBy('solicitud.fecha','desc')
-        ->first();
-
-        if(isset($verificaSocio['codSocio']))
-        {   
-            if($verificaSocio['estado']=='REC' or $verificaSocio['estado']=='ANU')
-            {
-                return $verificaSocio['codSocio'];
-            }
-        }
-        else
-        {
-            return null;
-        }
-    }
-    public function validarGaranteSolicitudPendiente($codSocio)
-    {
-        $verificaGarante = GaranteSolicitud::select('solicitud.estado','garantesolicitud.codSocio')
-        ->join('solicitud','solicitud.codSolicitud','garantesolicitud.codSolicitud')
-        ->join('socio','socio.codSocio','garantesolicitud.codSocio')
-        ->where('garantesolicitud.codSocio','=',$codSocio)
-        ->orderBy('solicitud.fecha','desc')
-        ->first();
-        if(isset($verificaGarante['codSocio']))
-        {
-            if($verificaGarante['estado']=='REC' or $verificaGarante['estado']=='ANU')
-            {
-                return $verificaGarante['codSocio'];
-            }            
-        }
-        else
-        {
-            return null;
         }
     }
 }

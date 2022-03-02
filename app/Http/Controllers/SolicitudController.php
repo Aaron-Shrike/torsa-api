@@ -71,7 +71,7 @@ class SolicitudController extends Controller
     {
         //
     }
-    public function registrarSolicitud(Request $request)
+    public function RegistrarSolicitud(Request $request)
     {    
         DB::beginTransaction();
         try 

@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers;
 use App\Http\Controllers\ContactoEmergenciaController;
 use App\Http\Controllers\SolicitudController;
+use App\Http\Controllers\TipoUsuarioController;
 
 /*
 |--------------------------------------------------------------------------
@@ -33,8 +34,8 @@ Route::post('/iniciar-sesion', [UsuarioController::class, 'IniciarSesion']);
 Route::post('/cerrar-sesion', [UsuarioController::class, 'CerrarSesion']);
 
 // Registrar Solicitud
-Route::get('/buscar-garante-habilitado/{dni}', [SocioController::class, 'buscarSocioGaranteHabilitado']);
-Route::post('/registrar-solicitud', [SolicitudController::class, 'registrarSolicitud']);
+Route::get('/buscar-garante-habilitado/{dni}', [SocioController::class, 'BuscarSocioGaranteHabilitado']);
+Route::post('/registrar-solicitud', [SolicitudController::class, 'RegistrarSolicitud']);
 
 Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('/registrar-trabajador', [TrabajadorController::class, 'store']);
