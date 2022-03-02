@@ -23,13 +23,11 @@ class CreateUsuarioTable extends Migration
 
             $table->foreign('codTrabajador')
             ->references('codTrabajador')
-            ->on('trabajador')
-            ->onDelete('set null');
+            ->on('trabajador');
 
             $table->foreign('codTipoUsuario')
             ->references('codTipoUsuario')
-            ->on('tipousuario')
-            ->onDelete('set null');
+            ->on('tipousuario');
 
             $table->timestamps();
         });

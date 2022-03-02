@@ -27,13 +27,11 @@ class CreateTrabajadorTable extends Migration
 
             $table->foreign('codTipoCargo')
             ->references('codTipoCargo')
-            ->on('tipocargo')
-            ->onDelete('set null');
+            ->on('tipocargo');
 
             $table->foreign('codConEmergencia')
             ->references('codConEmergencia')
-            ->on('contactoemergencia')
-            ->onDelete('set null');
+            ->on('contactoemergencia');
             
             $table->timestamps();
         });
