@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\TipoCargo;
 
-class TipocargoController extends Controller
+class TipoCargoController extends Controller
 {
     /**
      * Display a listing of the resource.
