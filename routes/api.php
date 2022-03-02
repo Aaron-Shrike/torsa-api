@@ -9,10 +9,6 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers;
 use App\Http\Controllers\ContactoEmergenciaController;
 use App\Http\Controllers\SolicitudController;
-use App\Http\Controllers\TipoUsuarioController;
-use App\Models\ContactoEmergencia;
-use App\Models\TipoCargo;
-use App\Models\TipoUsuario;
 
 /*
 |--------------------------------------------------------------------------
@@ -35,7 +31,10 @@ use App\Models\TipoUsuario;
 //Ruta para iniciar sesion
 Route::post('/iniciar-sesion', [UsuarioController::class, 'IniciarSesion']);
 Route::post('/cerrar-sesion', [UsuarioController::class, 'CerrarSesion']);
-Route::get('/obtener-cargos', [TipoCargoController::class, 'ObtenerCargos']);
+
+// Registrar Solicitud
+Route::get('/buscar-garante-habilitado/{dni}', [SocioController::class, 'buscarSocioGaranteHabilitado']);
+Route::post('/registrar-solicitud', [SolicitudController::class, 'registrarSolicitud']);
 
 Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('/registrar-trabajador', [TrabajadorController::class, 'store']);
@@ -55,6 +54,6 @@ Route::apiResource('socio',SocioController::class);
 Route::post('nuevo', 'App\Http\Controllers\UsuarioController@nuevo');
 Route::post('validarDNI', 'App\Http\Controllers\UsuarioController@validarDNI');
 Route::post('validarEmail', 'App\Http\Controllers\UsuarioController@validarEmail');
-Route::get('buscarSocioGaranteHabilitado/{dni}', 'App\Http\Controllers\SocioController@buscarSocioGaranteHabilitado');
-Route::post('registrarSolicitud','App\Http\Controllers\SolicitudController@registrarSolicitud');
+
+
 Route::get('listarSolicitudesDia','App\Http\Controllers\SolicitudController@listarSolicitudesDia');

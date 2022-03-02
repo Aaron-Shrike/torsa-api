@@ -103,47 +103,109 @@ class SocioController extends Controller
     }
     public function buscarSocioGaranteHabilitado($dni)
     {
+        try
+        {
             $data=array();
+            $error = [
+                'error' => true,
+                'mensaje' => ""
+            ];
+
             $socio = Socio::select("socio.codSocio","socio.dni","socio.nombre","socio.apePaterno","socio.apeMaterno",
-                   "socio.fecNacimiento","socio.telefono","socio.domicilio","socio.tipo")
-                 ->where([
-                      "socio.dni"=>$dni,
-                      "socio.activo"=>"1"
-                     ])
-                 ->first();
-                if(isset($socio['dni']))
-                {  
-                   $data = [
-                        'codSocio' => $socio['codSocio'],
-                        'dni' => $socio['dni'],
-                        'nombre'=> $socio['nombre'],
-                        'apePaterno'=> $socio['apePaterno'],
-                        'apeMaterno'=> $socio['apeMaterno'],
-                        'fecNacimiento'=> $socio['fecNacimiento'],
-                        'telefono'=> $socio['telefono'],
-                        'domicilio'=> $socio['domicilio'],
-                        'tipo'=> $socio['tipo'],
-                        ]; 
-                        if($this->validarSocioSolicitudPendiente($socio['codSocio'])==null)
+                    "socio.fecNacimiento","socio.telefono","socio.domicilio","socio.tipo")
+                    ->where([
+                        "socio.dni"=>$dni,
+                        "socio.activo"=>"1"
+                    ])
+                    ->first();
+
+            if(isset($socio['dni']))
+            {  
+                $data = [
+                    'codSocio' => $socio['codSocio'],
+                    'dni' => $socio['dni'],
+                    'nombre'=> $socio['nombre'],
+                    'apePaterno'=> $socio['apePaterno'],
+                    'apeMaterno'=> $socio['apeMaterno'],
+                    'fecNacimiento'=> $socio['fecNacimiento'],
+                    'telefono'=> $socio['telefono'],
+                    'domicilio'=> $socio['domicilio'],
+                    'tipo'=> $socio['tipo'],
+                ]; 
+
+                $verificaSocio = Socio::select('solicitud.estado','socio.codSocio')
+                        ->join('solicitud','solicitud.codSocio','socio.codSocio')
+                        ->where('socio.codSocio','=',$socio['codSocio'])
+                        ->orderBy('solicitud.fecha','desc')
+                        ->first();
+                if(isset($verificaSocio['codSocio']))
+                {   
+                    if($verificaSocio['estado']=='REC' or $verificaSocio['estado']=='ANU')
+                    {
+                        $verificaGarante = GaranteSolicitud::select('solicitud.estado','garantesolicitud.codSocio')
+                            ->join('solicitud','solicitud.codSolicitud','garantesolicitud.codSolicitud')
+                            ->join('socio','socio.codSocio','garantesolicitud.codSocio')
+                            ->where('garantesolicitud.codSocio','=',$socio['codSocio'])
+                            ->orderBy('solicitud.fecha','desc')
+                            ->first();
+                        if(isset($verificaGarante['codSocio']))
                         {
-                            return "Tiene una solicitud pendiente";
-                        }
-                        else
-                        {
-                            if($this->validarGaranteSolicitudPendiente($socio['codSocio'])==null)
-                            {
-                                return "Es garante de una solicitud pendiente ";
-                            }
-                            else
+                            if($verificaGarante['estado']=='REC' or $verificaGarante['estado']=='ANU')
                             {
                                 return response($data);
-                            }
-                        } 
+                            } 
+                            else
+                            {
+                                $error['mensaje'] = "Es garante de una solicitud pendiente.";
+                                return response($error);
+                            }           
+                        }
+                    }
+                    else
+                    {
+                        $error['mensaje'] = "Tiene una solicitud pendiente.";
+                        return response($error); 
+                    }
                 }
                 else
                 {
-                    return "Ingrese nuevo socio";
-                }
+                    $verificaGarante = GaranteSolicitud::select('solicitud.estado','garantesolicitud.codSocio')
+                    ->join('solicitud','solicitud.codSolicitud','garantesolicitud.codSolicitud')
+                    ->join('socio','socio.codSocio','garantesolicitud.codSocio')
+                    ->where('garantesolicitud.codSocio','=',$socio['codSocio'])
+                    ->orderBy('solicitud.fecha','desc')
+                    ->first();
+                    if(isset($verificaGarante['codSocio']))
+                    {
+                        if($verificaGarante['estado']=='REC' or $verificaGarante['estado']=='ANU')
+                        {
+                            return response($data);
+                        }   
+                        else
+                        {
+                            $error['mensaje'] = "Es garante de una solicitud pendiente.";
+                            return response($error);
+                        }         
+                    }
+                    else
+                    {
+                        return response($data); 
+                    }
+                } 
+            }
+            else
+            {
+                $error['mensaje'] = "Ingrese nuevo garante.";
+
+                return response($error);
+            }
+        }
+        catch(\Exception $e)
+        {
+            $mensaje = $e->getMessage();
+
+            return response($mensaje, 500);
+        }
     }
     public function validarSocioSolicitudPendiente($codSocio)
     {
@@ -152,6 +214,7 @@ class SocioController extends Controller
         ->where('socio.codSocio','=',$codSocio)
         ->orderBy('solicitud.fecha','desc')
         ->first();
+
         if(isset($verificaSocio['codSocio']))
         {   
             if($verificaSocio['estado']=='REC' or $verificaSocio['estado']=='ANU')
@@ -161,7 +224,7 @@ class SocioController extends Controller
         }
         else
         {
-            return $verificaSocio['codSocio'];
+            return null;
         }
     }
     public function validarGaranteSolicitudPendiente($codSocio)
@@ -181,8 +244,7 @@ class SocioController extends Controller
         }
         else
         {
-            return $verificaGarante['codSocio'];
+            return null;
         }
     }
-   
 }

@@ -74,116 +74,122 @@ class SolicitudController extends Controller
     public function registrarSolicitud(Request $request)
     {    
         DB::beginTransaction();
-        try {
-                //Solicitud y socio
-                if($request['datosSolicitud']['codSocio']!=null)
-                {
-                    $solicitud = new Solicitud([
-                        'codUsuario'=>$request['datosSolicitud']['codUsuario'],
-                        'codSocio'=>$request['datosSolicitud']['codSocio'],
-                        'monto'=>$request['datosSolicitud']['monto'],
-                        'motivo'=>$request['datosSolicitud']['motivo'],
-                        'fecha'=>Carbon::today()->format('Y-m-d'),
-                        'estado'=>'PVC'
-                    ]); 
+        try 
+        {
+            //Solicitud y socio
+            if($request['solicitud']['codSocio']!=null)
+            {
+                $solicitud = new Solicitud([
+                    'codUsuario'=>$request['solicitud']['codUsuario'],
+                    'codSocio'=>$request['solicitud']['codSocio'],
+                    'monto'=>$request['solicitud']['monto'],
+                    'motivo'=>$request['solicitud']['motivo'],
+                    'fecha'=>Carbon::today()->format('Y-m-d'),
+                    'estado'=>'PVC'
+                ]); 
 
-                    $socio = Socio::find($request->codSocio);
-                    if($socio->tipo=='Garante')
-                    {
-                        $socio->tipo = 'Socio';
-                        $socio->save();
-                    }
-                    
-                    $solicitud->save();
-                }
-                else
+                $socio = Socio::find($request->codSocio);
+                if($socio->tipo=='Garante')
                 {
-                    $socio = new Socio([
-                        'dni' =>$request['datosSocio']['dni'],
-                        'nombre' =>$request['datosSocio']['nombre'],
-                        'apePaterno'=>$request['datosSocio']['apePaterno'],
-                        'apeMaterno' =>$request['datosSocio']['apeMaterno'],
-                        'fecNacimiento' =>$request['datosSocio']['fecNacimiento'],
-                        'telefono'=>$request['datosSocio']['telefono'],
-                        'domicilio' =>$request['datosSocio']['domicilio'],
-                        'tipo' =>'Socio',
-                        'activo'=>1
-                    ]);
+                    $socio->tipo = 'Socio';
                     $socio->save();
-                    $solicitud = new Solicitud([
-                        'codSocio'=>$socio->codSocio,
-                        'codUsuario'=>$request['datosSolicitud']['codUsuario'],
-                        'monto'=>$request['datosSolicitud']['monto'],
-                        'motivo'=>$request['datosSolicitud']['motivo'],
-                        'fecha'=>Carbon::today()->format('Y-m-d'),
-                        'estado'=>'PVC'
-                    ]); 
-                    $solicitud->save();
                 }
-                //Garante uno
-                if($request['datosGarante1']['codGarante1']!=null)
-                {
-                   $garanteSolicitudUno = new GaranteSolicitud([
-                        'codSolicitud'=>$solicitud->codSolicitud,
-                        'codSocio'=>$request['datosGarante1']['codGarante1']
+                
+                $solicitud->save();
+            }
+            else
+            {
+                $socio = new Socio([
+                    'dni' =>$request['socio']['dni'],
+                    'nombre' =>$request['socio']['nombre'],
+                    'apePaterno'=>$request['socio']['apePaterno'],
+                    'apeMaterno' =>$request['socio']['apeMaterno'],
+                    'fecNacimiento' =>$request['socio']['fecNacimiento'],
+                    'telefono'=>$request['socio']['telefono'],
+                    'domicilio' =>$request['socio']['domicilio'],
+                    'tipo' =>'Socio',
+                    'activo'=>1
+                ]);
+                $socio->save();
+                $solicitud = new Solicitud([
+                    'codSocio'=>$socio->codSocio,
+                    'codUsuario'=>$request['solicitud']['codUsuario'],
+                    'monto'=>$request['solicitud']['monto'],
+                    'motivo'=>$request['solicitud']['motivo'],
+                    'fecha'=>Carbon::today()->format('Y-m-d'),
+                    'estado'=>'PVC'
+                ]); 
+                $solicitud->save();
+            }
+            //Garante uno
+            if($request['garante1']['codGarante']!=null)
+            {
+                $garanteSolicitudUno = new GaranteSolicitud([
+                    'codSolicitud'=>$solicitud->codSolicitud,
+                    'codSocio'=>$request['garante1']['codGarante']
+                ]);
+                $garanteSolicitudUno->save();
+            }
+            else
+            {
+                $garanteUno = new Socio([
+                    'dni'=>$request['garante1']['dni'],
+                    'nombre' =>$request['garante1']['nombre'],
+                    'apePaterno'=>$request['garante1']['apePaterno'],
+                    'apeMaterno' =>$request['garante1']['apeMaterno'],
+                    'fecNacimiento' =>$request['garante1']['fecNacimiento'],
+                    'telefono'=>$request['garante1']['telefono'],
+                    'domicilio' =>$request['garante1']['domicilio'],
+                    'tipo'=>'Garante',
+                    'activo'=>1
                     ]);
-                   $garanteSolicitudUno->save();
-                }
-                else
-                {
-                    $garanteUno = new Socio([
-                        'dni'=>$request['datosGarante1']['dni'],
-                        'nombre' =>$request['datosGarante1']['nombre'],
-                        'apePaterno'=>$request['datosGarante1']['apePaterno'],
-                        'apeMaterno' =>$request['datosGarante1']['apeMaterno'],
-                        'fecNacimiento' =>$request['datosGarante1']['fecNacimiento'],
-                        'telefono'=>$request['datosGarante1']['telefono'],
-                        'domicilio' =>$request['datosGarante1']['domicilio'],
-                        'tipo'=>'Garante',
-                        'activo'=>1
-                        ]);
-                    $garanteUno->save();
-                                    
-                    $garanteSolicitudUno = new GaranteSolicitud([
-                        'codSolicitud'=>$solicitud->codSolicitud,
-                        'codSocio'=>$garanteUno->codSocio
-                    ]);
-                    $garanteSolicitudUno->save();
-                }
-                //Garante dos
-                if($request['datosGarante2']['codGarante2']!=null)
-                {
-                     $garanteSolicitudDos = new GaranteSolicitud([
-                         'codSolicitud'=>$solicitud->codSolicitud,
-                         'codSocio'=>$request['datosGarante2']['codGarante2']
-                     ]);
-                    $garanteSolicitudDos->save();
-                }
-                else
-                {
-                    $garanteDos = new Socio([
-                        'dni'=>$request['datosGarante2']['dni'],
-                        'nombre' =>$request['datosGarante2']['nombre'],
-                        'apePaterno'=>$request['datosGarante2']['apePaterno'],
-                        'apeMaterno' =>$request['datosGarante2']['apeMaterno'],
-                        'fecNacimiento' =>$request['datosGarante2']['fecNacimiento'],
-                        'telefono'=>$request['datosGarante2']['telefono'],
-                        'domicilio' =>$request['datosGarante2']['domicilio'],
-                        'tipo'=>'Garante',
-                        'activo'=>1
-                           ]);
-                    $garanteDos->save();
-                    $garanteSolicitudDos = new GaranteSolicitud([
-                           'codSolicitud'=>$solicitud->codSolicitud,
-                           'codSocio'=>$garanteDos->codSocio
-                    ]);
-                    $garanteSolicitudDos->save();
-                }
-                          
+                $garanteUno->save();
+                                
+                $garanteSolicitudUno = new GaranteSolicitud([
+                    'codSolicitud'=>$solicitud->codSolicitud,
+                    'codSocio'=>$garanteUno->codSocio
+                ]);
+                $garanteSolicitudUno->save();
+            }
+            //Garante dos
+            if($request['garante2']['codGarante']!=null)
+            {
+                $garanteSolicitudDos = new GaranteSolicitud([
+                    'codSolicitud'=>$solicitud->codSolicitud,
+                    'codSocio'=>$request['garante2']['codGarante']
+                ]);
+                $garanteSolicitudDos->save();
+            }
+            else
+            {
+                $garanteDos = new Socio([
+                    'dni'=>$request['garante2']['dni'],
+                    'nombre' =>$request['garante2']['nombre'],
+                    'apePaterno'=>$request['garante2']['apePaterno'],
+                    'apeMaterno' =>$request['garante2']['apeMaterno'],
+                    'fecNacimiento' =>$request['garante2']['fecNacimiento'],
+                    'telefono'=>$request['garante2']['telefono'],
+                    'domicilio' =>$request['garante2']['domicilio'],
+                    'tipo'=>'Garante',
+                    'activo'=>1
+                ]);
+                $garanteDos->save();
+                $garanteSolicitudDos = new GaranteSolicitud([
+                    'codSolicitud'=>$solicitud->codSolicitud,
+                    'codSocio'=>$garanteDos->codSocio
+                ]);
+                $garanteSolicitudDos->save();
+            }
+
             DB::commit();
-        }catch (\Exception $e) {
-        DB::rollback();
-        return $e->getMessage();
+        }
+        catch (\Exception $e) 
+        {
+            DB::rollback();
+
+            $mensaje = $e->getMessage();
+
+            return response($mensaje, 500);
         }
     }
     public function listarSolicitudesDia(){
@@ -209,5 +215,4 @@ class SolicitudController extends Controller
         return response()->json($solicitudesDia,200);
     }
 
-   
 }
