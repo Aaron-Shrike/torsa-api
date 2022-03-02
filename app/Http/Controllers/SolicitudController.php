@@ -88,7 +88,7 @@ class SolicitudController extends Controller
                     'estado'=>'PVC'
                 ]); 
 
-                $socio = Socio::find($request->codSocio);
+                $socio = Socio::find($request['solicitud']['codSocio']);
                 if($socio->tipo=='Garante')
                 {
                     $socio->tipo = 'Socio';
@@ -137,7 +137,8 @@ class SolicitudController extends Controller
                     'nombre' =>$request['garante1']['nombre'],
                     'apePaterno'=>$request['garante1']['apePaterno'],
                     'apeMaterno' =>$request['garante1']['apeMaterno'],
-                    'fecNacimiento' =>$request['garante1']['fecNacimiento'],
+                    // 'fecNacimiento' =>$request['garante1']['fecNacimiento'],
+                    'fecNacimiento' =>'1900-01-01',
                     'telefono'=>$request['garante1']['telefono'],
                     'domicilio' =>$request['garante1']['domicilio'],
                     'tipo'=>'Garante',
@@ -167,7 +168,8 @@ class SolicitudController extends Controller
                     'nombre' =>$request['garante2']['nombre'],
                     'apePaterno'=>$request['garante2']['apePaterno'],
                     'apeMaterno' =>$request['garante2']['apeMaterno'],
-                    'fecNacimiento' =>$request['garante2']['fecNacimiento'],
+                    // 'fecNacimiento' =>$request['garante2']['fecNacimiento'],
+                    'fecNacimiento' =>'1900-01-01',
                     'telefono'=>$request['garante2']['telefono'],
                     'domicilio' =>$request['garante2']['domicilio'],
                     'tipo'=>'Garante',
