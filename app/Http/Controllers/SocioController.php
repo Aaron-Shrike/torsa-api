@@ -225,44 +225,4 @@ class SocioController extends Controller
             return response($mensaje, 500);
         }
     }
-    public function validarSocioSolicitudPendiente($codSocio)
-    {
-        $verificaSocio = Socio::select('solicitud.estado','socio.codSocio')
-        ->join('solicitud','solicitud.codSocio','socio.codSocio')
-        ->where('socio.codSocio','=',$codSocio)
-        ->orderBy('solicitud.fecha','desc')
-        ->first();
-
-        if(isset($verificaSocio['codSocio']))
-        {   
-            if($verificaSocio['estado']=='REC' or $verificaSocio['estado']=='ANU')
-            {
-                return $verificaSocio['codSocio'];
-            }
-        }
-        else
-        {
-            return null;
-        }
-    }
-    public function validarGaranteSolicitudPendiente($codSocio)
-    {
-        $verificaGarante = GaranteSolicitud::select('solicitud.estado','garantesolicitud.codSocio')
-        ->join('solicitud','solicitud.codSolicitud','garantesolicitud.codSolicitud')
-        ->join('socio','socio.codSocio','garantesolicitud.codSocio')
-        ->where('garantesolicitud.codSocio','=',$codSocio)
-        ->orderBy('solicitud.fecha','desc')
-        ->first();
-        if(isset($verificaGarante['codSocio']))
-        {
-            if($verificaGarante['estado']=='REC' or $verificaGarante['estado']=='ANU')
-            {
-                return $verificaGarante['codSocio'];
-            }            
-        }
-        else
-        {
-            return null;
-        }
-    }
 }
