@@ -39,7 +39,7 @@ class UsuarioController extends Controller
                     {
                         $data = [
                             'dni' => $consulta['dni'],
-                            'codigo' => $consulta['codUsuario'],
+                            'codUsuario' => $consulta['codUsuario'],
                             'tipoUsuario' => $consulta['descripcion'],
                             'nombre'=> $consulta['nombre'],
                             'apePaterno'=> $consulta['apePaterno'],
