@@ -11,6 +11,8 @@ use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
 use App\Http\Controllers\SocioController;
 use Illuminate\Support\Facades\DB;
+use App\Http\Controllers\Route;
+use App\Http\Controllers\UsuarioController;
 
 class SolicitudController extends Controller
 {
@@ -199,9 +201,10 @@ class SolicitudController extends Controller
 
         $fechaDeHoy = Carbon::today()->format('Y-m-d');
 
-        //$codigo = Auth::codUsuario();
-        $codigo = auth()->user()->codUsuario;
         
+        $codigo = Auth::codUsuario();
+        //$codigo = auth()->user()->codUsuario;
+
         $solicitudesDia = Solicitud::select('solicitud.codSolicitud','solicitud.codUsuario',
                         'solicitud.codSocio','solicitud.monto','solicitud.motivo','solicitud.fecha','solicitud.estado',
                         'socio.codSocio','socio.dni','socio.nombre','socio.apePaterno','socio.apeMaterno','socio.telefono')
@@ -210,7 +213,7 @@ class SolicitudController extends Controller
                         ->where([
                             'solicitud.codUsuario'=>$codigo,
                             'solicitud.fecha'=>$fechaDeHoy,
-                            'solicitud.estado'=>"1"
+                            'solicitud.estado'=>"PVC"
                             ])
                             ->get();
 
