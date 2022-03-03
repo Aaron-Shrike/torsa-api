@@ -57,4 +57,4 @@ Route::post('validarDNI', 'App\Http\Controllers\UsuarioController@ValidarDNI');
 Route::post('validarEmail', 'App\Http\Controllers\UsuarioController@ValidarEmail');
 
 
-Route::get('listarSolicitudesDia','App\Http\Controllers\SolicitudController@ListarSolicitudesDia');
+Route::get('/listarSolicitudesDia/{codigo}','App\Http\Controllers\SolicitudController@ListarSolicitudesDia');

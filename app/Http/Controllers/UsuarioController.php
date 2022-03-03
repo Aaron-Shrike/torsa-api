@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\DB;
 
 class UsuarioController extends Controller
 {
+
     //Inicio de sesion
     public function IniciarSesion(Request $request)
     {
@@ -45,7 +46,7 @@ class UsuarioController extends Controller
                             'apePaterno'=> $consulta['apePaterno'],
                             'apeMaterno'=> $consulta['apeMaterno'],
                         ];
-                    
+
                     }   
                     else
                     {
@@ -114,7 +115,7 @@ class UsuarioController extends Controller
 
     public function Nuevo(Request $request){
         //dd(request()->all());
-        $alt = Str::random(10);
+        
 
         $request->validate([
             'nombreC'=>'required',
@@ -133,6 +134,9 @@ class UsuarioController extends Controller
         ]);
         DB::beginTransaction();
         try {
+
+            $alt = Str::random(10);
+
             //CREAMOS EL CONTACTO DE EMERGENCIA
             $contactoEmergencia = new ContactoEmergencia([
                 'nombre'=>$request->get('nombreC'),
@@ -167,10 +171,10 @@ class UsuarioController extends Controller
 
             ]);
             $usuario->save();
+            
             DB::commit();
-
-            $receivers = Trabajador::all('correo')->max('correo');
-
+    
+            $receivers = $trabajador->correo;
             Mail::to($receivers)->send(new TestMail($alt));
             return "Correo Electronico Enviado";
         
