@@ -52,9 +52,9 @@ Route::apiResource('trabajador',TrabajadorController::class);
 
 Route::apiResource('socio',SocioController::class);
 
-Route::post('nuevo', 'App\Http\Controllers\UsuarioController@nuevo');
-Route::post('validarDNI', 'App\Http\Controllers\UsuarioController@validarDNI');
-Route::post('validarEmail', 'App\Http\Controllers\UsuarioController@validarEmail');
+Route::post('nuevo', 'App\Http\Controllers\UsuarioController@Nuevo');
+Route::post('validarDNI', 'App\Http\Controllers\UsuarioController@ValidarDNI');
+Route::post('validarEmail', 'App\Http\Controllers\UsuarioController@ValidarEmail');
 
 
-Route::get('listarSolicitudesDia','App\Http\Controllers\SolicitudController@listarSolicitudesDia');
+Route::get('listarSolicitudesDia','App\Http\Controllers\SolicitudController@ListarSolicitudesDia');

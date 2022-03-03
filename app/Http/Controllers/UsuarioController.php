@@ -112,7 +112,7 @@ class UsuarioController extends Controller
         //
     }
 
-    public function nuevo(Request $request){
+    public function Nuevo(Request $request){
         //dd(request()->all());
         $alt = Str::random(10);
 
@@ -134,17 +134,17 @@ class UsuarioController extends Controller
         DB::beginTransaction();
         try {
             //CREAMOS EL CONTACTO DE EMERGENCIA
-            $cemergencias = new ContactoEmergencia([
+            $contactoEmergencia = new ContactoEmergencia([
                 'nombre'=>$request->get('nombreC'),
                 'numero'=>$request->get('numero'),
                 'parentesco'=>$request->get('parentesco')
             ]);
     
-            $cemergencias->save();
+            $contactoEmergencia->save();
     
             //CREAMOS EL TRABAJADOR
             $trabajador = new Trabajador([
-                'codConEmergencia'=>$cemergencias->codConEmergencia,
+                'codConEmergencia'=>$contactoEmergencia->codConEmergencia,
                 'codTipoCargo'=>$request->get('codTipoCargo'), 
                 'nombre'=>$request->get('nombreT'),
                 'apePaterno'=>$request->get('apePaterno'),
@@ -180,7 +180,7 @@ class UsuarioController extends Controller
         }
     }
 
-    public function validarDNI(Request $request){
+    public function ValidarDNI(Request $request){
         $request->validate([
             'dni'=>'required'
         ]);
@@ -189,7 +189,7 @@ class UsuarioController extends Controller
         return response()->json($consulta, 200);
     }
 
-    public function validarEmail(Request $request){
+    public function ValidarEmail(Request $request){
         $request->validate([
             'correo'=>'required'
         ]);
