@@ -194,7 +194,7 @@ class SolicitudController extends Controller
             return response($mensaje, 500);
         }
     }
-    public function listarSolicitudesDia(){
+    public function ListarSolicitudesDia(){
         //dd(request()->all());
 
         $fechaDeHoy = Carbon::today()->format('Y-m-d');
