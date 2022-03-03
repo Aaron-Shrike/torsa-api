@@ -196,13 +196,13 @@ class SolicitudController extends Controller
             return response($mensaje, 500);
         }
     }
-    public function ListarSolicitudesDia(){
+    public function ListarSolicitudesDia($codigo){
         //dd(request()->all());
 
         $fechaDeHoy = Carbon::today()->format('Y-m-d');
 
         
-        $codigo = Auth::codUsuario();
+        //$codigo = Auth::codUsuario();
         //$codigo = auth()->user()->codUsuario;
 
         $solicitudesDia = Solicitud::select('solicitud.codSolicitud','solicitud.codUsuario',
