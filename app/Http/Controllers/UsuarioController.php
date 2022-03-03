@@ -157,13 +157,13 @@ class UsuarioController extends Controller
                 'telefono'=>$request->get('telefono'),
                 'domicilio'=>$request->get('domicilio'),
                 'correo'=>$request->get('correo'), 
-    
             ]);
             $trabajador->save();
     
             //CREAMOS EL USUARIO
             $usuario = new Usuario([
-                'codTipoUsuario'=>$request->get('codTipoUsuario'),
+                // 'codTipoUsuario'=>$request->get('codTipoUsuario'),
+                'codTipoUsuario'=>$request->get('codTipoCargo'),
                 'codTrabajador'=>$trabajador->codTrabajador,
                 'dni'=>$request->get('dni'),
                 'contrasenia'=>Hash::make($alt),
