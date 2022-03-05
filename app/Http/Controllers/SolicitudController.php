@@ -194,18 +194,15 @@ class SolicitudController extends Controller
             return response($mensaje, 500);
         }
     }
-    public function ValidarTelefonoSocioGarante(Request $request)
+    public function ValidarTelefonoSocioGarante($telefono)
     {
-        $request->validate([
-            'telefono'=>'required'
-        ]);
-        $consulta = Socio::where('socio.telefono','=',$request->telefono)
+        $consulta = Socio::where('socio.telefono','=',$telefono)
             ->count();
+
         return response()->json($consulta, 200);
-        
     }
-    public function ListarSolicitudesDia($codigo){
-     
+    public function ListarSolicitudesDia($codigo)
+    {
         $fechaAyer=  Carbon::yesterday();
 
         $solicitudesDia = Solicitud::select('solicitud.codSolicitud','solicitud.codUsuario',
