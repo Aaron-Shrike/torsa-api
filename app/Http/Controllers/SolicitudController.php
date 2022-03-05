@@ -214,12 +214,9 @@ class SolicitudController extends Controller
                             'solicitud.codUsuario'=>$codigo,
                             'solicitud.estado'=>'PVC'
                             ])
-                        ->where('solicitud.fecha','>',date($fechaAyer))
+                        ->where('solicitud.fecha','>',date("Y-m-d H:i:s",strtotime($fechaAyer."+ 23 hours + 59 minutes + 59 seconds")))
                         ->where('solicitud.fecha','<',date("Y-m-d H:i:s",strtotime($fechaAyer."+ 2 days")))
                             ->get();
-                            //return date($fechaAyer);
-                           // return date($fechaMañana);
-                          // return date("Y-m-d H:i:s",strtotime($fechaAyer."+ 2 days"));
         return response()->json($solicitudesDia,200);
     }
 }
