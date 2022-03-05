@@ -36,6 +36,7 @@ Route::post('/cerrar-sesion', [UsuarioController::class, 'CerrarSesion']);
 // Registrar Solicitud
 Route::get('/buscar-garante-habilitado/{dni}', [SocioController::class, 'BuscarSocioGaranteHabilitado']);
 Route::post('/registrar-solicitud', [SolicitudController::class, 'RegistrarSolicitud']);
+Route::post('/validar-telefono', [SolicitudController::class, 'ValidarTelefonoSocioGarante']);
 
 Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('/registrar-trabajador', [TrabajadorController::class, 'store']);

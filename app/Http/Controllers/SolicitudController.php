@@ -86,7 +86,7 @@ class SolicitudController extends Controller
                     'codSocio'=>$request['solicitud']['codSocio'],
                     'monto'=>$request['solicitud']['monto'],
                     'motivo'=>$request['solicitud']['motivo'],
-                    'fecha'=>Carbon::today()->format('Y-m-d'),
+                    'fecha'=>Carbon::now(),
                     'estado'=>'PVC'
                 ]); 
 
@@ -118,7 +118,7 @@ class SolicitudController extends Controller
                     'codUsuario'=>$request['solicitud']['codUsuario'],
                     'monto'=>$request['solicitud']['monto'],
                     'motivo'=>$request['solicitud']['motivo'],
-                    'fecha'=>Carbon::today()->format('Y-m-d'),
+                    'fecha'=>Carbon::now(),
                     'estado'=>'PVC'
                 ]); 
                 $solicitud->save();
@@ -194,14 +194,19 @@ class SolicitudController extends Controller
             return response($mensaje, 500);
         }
     }
-    public function ListarSolicitudesDia($codigo){
-        //dd(request()->all());
-
-        $fechaDeHoy = Carbon::today()->format('Y-m-d');
-
+    public function ValidarTelefonoSocioGarante(Request $request)
+    {
+        $request->validate([
+            'telefono'=>'required'
+        ]);
+        $consulta = Socio::where('socio.telefono','=',$request->telefono)
+            ->count();
+        return response()->json($consulta, 200);
         
-        //$codigo = Auth::codUsuario();
-        //$codigo = auth()->user()->codUsuario;
+    }
+    public function ListarSolicitudesDia($codigo){
+     
+        $fechaAyer=  Carbon::yesterday();
 
         $solicitudesDia = Solicitud::select('solicitud.codSolicitud','solicitud.codUsuario',
                         'solicitud.codSocio','solicitud.monto','solicitud.motivo','solicitud.fecha','solicitud.estado',
@@ -210,12 +215,14 @@ class SolicitudController extends Controller
                         ->join("socio","socio.codSocio","solicitud.codSocio")
                         ->where([
                             'solicitud.codUsuario'=>$codigo,
-                            'solicitud.fecha'=>$fechaDeHoy,
-                            'solicitud.estado'=>"PVC"
+                            'solicitud.estado'=>'PVC'
                             ])
+                        ->where('solicitud.fecha','>',date($fechaAyer))
+                        ->where('solicitud.fecha','<',date("Y-m-d H:i:s",strtotime($fechaAyer."+ 2 days")))
                             ->get();
-
+                            //return date($fechaAyer);
+                           // return date($fechaMañana);
+                          // return date("Y-m-d H:i:s",strtotime($fechaAyer."+ 2 days"));
         return response()->json($solicitudesDia,200);
     }
-
 }
