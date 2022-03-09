@@ -212,7 +212,7 @@ class SocioController extends Controller
             }
             else
             {
-                $error['mensaje'] = "Ingrese nuevo garante.";
+                $error['mensaje'] = "DNI no registrado. ¡Ingrese los datos!";
                 $error['error'] = false;
 
                 return response($error);
