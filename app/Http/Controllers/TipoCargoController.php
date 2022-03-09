@@ -14,7 +14,8 @@ class TipoCargoController extends Controller
      */
     public function index()
     {
-        $tcargos = TipoCargo::all();
+        $tcargos = TipoCargo::query()->orderBy('descripcion')->get();
+        // $tcargos = TipoCargo::all();
         return \response($tcargos);
         //response()->json($tcargos, 200);
     }
