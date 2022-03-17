@@ -173,9 +173,9 @@ class UsuarioController extends Controller
             $usuario->save();
             
             DB::commit();
-    
+            $name = $trabajador->nombre;
             $receivers = $trabajador->correo;
-            Mail::to($receivers)->send(new TestMail($alt));
+            Mail::to($receivers)->send(new TestMail($alt,$name));
             return "Correo Electronico Enviado";
         
         } catch (\Exception $e) {

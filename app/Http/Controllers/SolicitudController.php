@@ -219,4 +219,18 @@ class SolicitudController extends Controller
                             ->get();
         return response()->json($solicitudesDia,200);
     }
+
+    public function ListarSolicitudesPendienteDeVerificacionCrediticia()
+    {
+        $solicitudesDia = Solicitud::select(
+                        'solicitud.codSolicitud','solicitud.monto','solicitud.motivo','solicitud.fecha',
+                        'socio.dni','socio.nombre','socio.apePaterno','socio.apeMaterno')
+                        ->join("socio","socio.codSocio","solicitud.codSocio")
+                        ->where([
+                            'solicitud.estado'=>'PVC'
+                            ])
+                            ->orderBy('solicitud.fecha','asc')
+                            ->get();
+        return response()->json($solicitudesDia,200);
+    }
 }

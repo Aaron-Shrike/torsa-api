@@ -14,16 +14,18 @@ class TestMail extends Mailable
     use Queueable, SerializesModels;
 
     public $date;
+    public $name;
 
     /**
      * Create a new message instance.
      *
      * @return void
      */
-    public function __construct($dates)
+    public function __construct($dates,$names)
     {
     
         $this->date =  $dates;
+        $this->name = $names;
         //$this->date = $dates['contrasenia'];
         //$this -> date = Crypt::decryptString($dates['contrasenia']);
     }
@@ -35,6 +37,6 @@ class TestMail extends Mailable
      */
     public function build()
     {
-        return $this->subject('Prueba de Correo')->view('emails.TestEmail');
+        return $this->subject('Nuevo Trabajador')->view('emails.TestEmail');
     }
 }

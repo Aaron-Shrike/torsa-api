@@ -59,3 +59,4 @@ Route::post('validarEmail', 'App\Http\Controllers\UsuarioController@ValidarEmail
 
 
 Route::get('/listarSolicitudesDia/{codigo}','App\Http\Controllers\SolicitudController@ListarSolicitudesDia');
+Route::post('/solicitud-pendiente-verificacion-crediticia', [SolicitudController::class, 'ListarSolicitudesPendienteDeVerificacionCrediticia']);
