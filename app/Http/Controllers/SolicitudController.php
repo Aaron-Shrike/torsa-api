@@ -25,6 +25,10 @@ class SolicitudController extends Controller
     {
         //
         //traer datos de base datos de solic reg
+        $solicitud = Solicitud::all();
+        return \response($solicitud);
+        //response()->json($solicitud, 200);
+
     }
 
     /**
@@ -49,6 +53,7 @@ class SolicitudController extends Controller
     {
         //
         //mostrando una solicitud segun su codigo
+        return Solicitud::find($id);
     }
 
     /**
@@ -218,6 +223,17 @@ class SolicitudController extends Controller
                         ->where('solicitud.fecha','<',date("Y-m-d H:i:s",strtotime($fechaAyer."+ 2 days")))
                             ->get();
         return response()->json($solicitudesDia,200);
+    }
+
+    //Vamos a Anular una  solicitud que se encuentre en estado de Pendiente de Verificación Crediticia en la vista de Lista de Solicitudes Diaria
+    public function AnularSolicitudPVC($id){
+        $solicitud = Solicitud::findOrFail($id);
+
+        $solicitud->estado = 'ANU';
+
+        $solicitud->save();
+
+        return response()->json($solicitud,200);
     }
 
     public function ListarSolicitudesPendienteDeVerificacionCrediticia()

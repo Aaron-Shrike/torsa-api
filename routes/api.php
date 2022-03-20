@@ -10,6 +10,7 @@ use App\Http\Controllers;
 use App\Http\Controllers\ContactoEmergenciaController;
 use App\Http\Controllers\SolicitudController;
 use App\Http\Controllers\TipoUsuarioController;
+use App\Models\Solicitud;
 
 /*
 |--------------------------------------------------------------------------
@@ -53,6 +54,8 @@ Route::apiResource('trabajador',TrabajadorController::class);
 
 Route::apiResource('socio',SocioController::class);
 
+Route::apiResource('solicitud',SolicitudController::class);
+
 Route::post('nuevo', 'App\Http\Controllers\UsuarioController@Nuevo');
 Route::post('validarDNI', 'App\Http\Controllers\UsuarioController@ValidarDNI');
 Route::post('validarEmail', 'App\Http\Controllers\UsuarioController@ValidarEmail');
@@ -60,3 +63,4 @@ Route::post('validarEmail', 'App\Http\Controllers\UsuarioController@ValidarEmail
 
 Route::get('/listarSolicitudesDia/{codigo}','App\Http\Controllers\SolicitudController@ListarSolicitudesDia');
 Route::post('/solicitud-pendiente-verificacion-crediticia', [SolicitudController::class, 'ListarSolicitudesPendienteDeVerificacionCrediticia']);
+Route::post('/anularSolicitudPVC/{codigo}','App\Http\Controllers\SolicitudController@AnularSolicitudPVC');
