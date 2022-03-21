@@ -8,8 +8,12 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers;
 use App\Http\Controllers\ContactoEmergenciaController;
+use App\Http\Controllers\DepartamentoController;
+use App\Http\Controllers\DistritoController;
+use App\Http\Controllers\ProvinciaController;
 use App\Http\Controllers\SolicitudController;
 use App\Http\Controllers\TipoUsuarioController;
+use App\Models\Departamento;
 use App\Models\Solicitud;
 
 /*
@@ -44,23 +48,23 @@ Route::middleware(['auth:sanctum'])->group(function () {
     // Route::post('/registrar-solicitud', [, 'store']);
 });
 
+//Creacion de rutas de los crud de las tablas
 Route::apiResource('tipocargo',TipoCargoController::class);
-
 Route::apiResource('tipousuario',TipoUsuarioController::class);
-
 Route::apiResource('contactoemergencias',ContactoEmergenciaController::class);
-
 Route::apiResource('trabajador',TrabajadorController::class);
-
 Route::apiResource('socio',SocioController::class);
-
 Route::apiResource('solicitud',SolicitudController::class);
+Route::apiResource('departamento',DepartamentoController::class);
+Route::apiResource('provincia',ProvinciaController::class);
+Route::apiResource('distrito',DistritoController::class);
 
+//Rutas de UsuarioController
 Route::post('nuevo', 'App\Http\Controllers\UsuarioController@Nuevo');
 Route::post('validarDNI', 'App\Http\Controllers\UsuarioController@ValidarDNI');
 Route::post('validarEmail', 'App\Http\Controllers\UsuarioController@ValidarEmail');
 
-
+//Rutas de SolicitudController
 Route::get('/listarSolicitudesDia/{codigo}','App\Http\Controllers\SolicitudController@ListarSolicitudesDia');
 Route::post('/solicitud-pendiente-verificacion-crediticia', [SolicitudController::class, 'ListarSolicitudesPendienteDeVerificacionCrediticia']);
 Route::post('/anularSolicitudPVC/{codigo}','App\Http\Controllers\SolicitudController@AnularSolicitudPVC');
