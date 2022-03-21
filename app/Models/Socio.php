@@ -12,7 +12,7 @@ class Socio extends Model
    protected $table = "socio";
    protected $primaryKey = "codSocio";
    
-   protected $fillable = ['dni','nombre','apePaterno','apeMaterno','fecNacimiento','telefono','domicilio','tipo','activo'];
+   protected $fillable = ['codDistrito','dni','nombre','apePaterno','apeMaterno','fecNacimiento','telefono','domicilio','tipo','activo'];
 
    public $timestamps = false;
 }

@@ -64,3 +64,4 @@ Route::post('validarEmail', 'App\Http\Controllers\UsuarioController@ValidarEmail
 Route::get('/listarSolicitudesDia/{codigo}','App\Http\Controllers\SolicitudController@ListarSolicitudesDia');
 Route::post('/solicitud-pendiente-verificacion-crediticia', [SolicitudController::class, 'ListarSolicitudesPendienteDeVerificacionCrediticia']);
 Route::post('/anularSolicitudPVC/{codigo}','App\Http\Controllers\SolicitudController@AnularSolicitudPVC');
+Route::post('/consultarDetalleSolicitud/{codigo}','App\Http\Controllers\SolicitudController@ConsultarDetalleSolicitudDeCredito');

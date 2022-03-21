@@ -13,7 +13,7 @@ class Trabajador extends Model
     protected $table = "trabajador";
 
     protected $fillable = [
-        'codConEmergencia','codTipoCargo','nombre','apePaterno','apeMaterno','fecNacimiento','telefono','domicilio','correo'
+        'codConEmergencia','codTipoCargo','codDistrito','nombre','apePaterno','apeMaterno','fecNacimiento','telefono','domicilio','correo'
     ];
 
     public $timestamps = false;

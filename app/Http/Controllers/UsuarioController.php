@@ -46,7 +46,6 @@ class UsuarioController extends Controller
                             'apePaterno'=> $consulta['apePaterno'],
                             'apeMaterno'=> $consulta['apeMaterno'],
                         ];
-
                     }   
                     else
                     {
@@ -121,6 +120,7 @@ class UsuarioController extends Controller
             'nombreC'=>'required',
             'numero'=>'required',
             'parentesco'=>'required',
+            'codDistrito'=>'required',
             'nombreT'=>'required',
             'apePaterno'=>'required',
             'apeMaterno'=>'required',
@@ -149,7 +149,8 @@ class UsuarioController extends Controller
             //CREAMOS EL TRABAJADOR
             $trabajador = new Trabajador([
                 'codConEmergencia'=>$contactoEmergencia->codConEmergencia,
-                'codTipoCargo'=>$request->get('codTipoCargo'), 
+                'codTipoCargo'=>$request->get('codTipoCargo'),
+                'codDistrito'=>$request->get('codDistrito'), 
                 'nombre'=>$request->get('nombreT'),
                 'apePaterno'=>$request->get('apePaterno'),
                 'apeMaterno'=>$request->get('apeMaterno'),

@@ -107,6 +107,7 @@ class SolicitudController extends Controller
             else
             {
                 $socio = new Socio([
+                    'codDistrito' =>$request['socio']['codDistrito'],
                     'dni' =>$request['socio']['dni'],
                     'nombre' =>$request['socio']['nombre'],
                     'apePaterno'=>$request['socio']['apePaterno'],
@@ -140,6 +141,7 @@ class SolicitudController extends Controller
             else
             {
                 $garanteUno = new Socio([
+                    'codDistrito' =>$request['garante1']['codDistrito'],
                     'dni'=>$request['garante1']['dni'],
                     'nombre' =>$request['garante1']['nombre'],
                     'apePaterno'=>$request['garante1']['apePaterno'],
@@ -170,6 +172,7 @@ class SolicitudController extends Controller
             else
             {
                 $garanteDos = new Socio([
+                    'codDistrito' =>$request['garante2']['codDistrito'],
                     'dni'=>$request['garante2']['dni'],
                     'nombre' =>$request['garante2']['nombre'],
                     'apePaterno'=>$request['garante2']['apePaterno'],
@@ -248,5 +251,27 @@ class SolicitudController extends Controller
                             ->orderBy('solicitud.fecha','asc')
                             ->get();
         return response()->json($solicitudesDia,200);
+    }
+
+    public function ConsultarDetalleSolicitudDeCredito($cod){
+
+        $data = array();
+
+        $solicitud = Solicitud::join('usuario','solicitud.codUsuario','=','usuario.codUsuario')
+                                ->join('socio','solicitud.codSocio','=','socio.codSocio')
+                                ->select('solicitud.codSolicitud','solicitud.monto','solicitud.motivo','solicitud.fecha','solicitud.estado',
+                                'usuario.codTipoUsuario','usuario.codTrabajador','usuario.dni','usuario.activo',
+                                'socio.codDistrito','socio.dni','socio.nombre','socio.apePaterno','socio.apeMaterno','socio.fecNacimiento','socio.telefono','socio.domicilio','socio.tipo','socio.activo')
+                                ->where('solicitud.codSolicitud', $cod)
+                                ->first();
+
+        $garantes = GaranteSolicitud::join('socio','garantesolicitud.codSocio','=','socio.codSocio')
+                                        ->select('garantesolicitud.codGaranteSolicitud','socio.codDistrito','socio.dni','socio.nombre','socio.apePaterno','socio.apeMaterno','socio.fecNacimiento','socio.telefono','socio.domicilio','socio.tipo','socio.activo')
+                                        ->where('garantesolicitud.codSolicitud',$cod)
+                                        ->get();
+
+        $data = [$solicitud,$garantes];
+        
+        return response()->json($data,200);
     }
 }
