@@ -73,4 +73,21 @@ class ProvinciaController extends Controller
         $provincia->delete();
         return response()->json(null,204);
     }
+
+    public function ObtenerProvincias($codDepartamento)
+    {
+        try
+        {
+            $consulta=Provincia::select('codProvincia','nombre')
+                        ->where('codDepartamento',$codDepartamento)
+                        ->get();
+            return response($consulta);
+        }
+        catch (\Exception $ex) 
+        {
+            $data = $ex->getMessage();
+            
+            return response($data, 400);
+        }
+    }
 }

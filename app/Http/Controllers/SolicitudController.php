@@ -115,6 +115,7 @@ class SolicitudController extends Controller
                     'fecNacimiento' =>$request['socio']['fecNacimiento'],
                     'telefono'=>$request['socio']['telefono'],
                     'domicilio' =>$request['socio']['domicilio'],
+                    'codDistrito'=>$request['socio']['codDistrito'],
                     'tipo' =>'Socio',
                     'activo'=>1
                 ]);
@@ -149,6 +150,7 @@ class SolicitudController extends Controller
                     'fecNacimiento' =>$request['garante1']['fecNacimiento'],
                     'telefono'=>$request['garante1']['telefono'],
                     'domicilio' =>$request['garante1']['domicilio'],
+                    'codDistrito'=>$request['garante1']['distrito'],
                     'tipo'=>'Garante',
                     'activo'=>1
                     ]);
@@ -180,6 +182,7 @@ class SolicitudController extends Controller
                     'fecNacimiento' =>$request['garante2']['fecNacimiento'],
                     'telefono'=>$request['garante2']['telefono'],
                     'domicilio' =>$request['garante2']['domicilio'],
+                    'codDistrito'=>$request['garante2']['distrito'],
                     'tipo'=>'Garante',
                     'activo'=>1
                 ]);
@@ -242,7 +245,7 @@ class SolicitudController extends Controller
     public function ListarSolicitudesPendienteDeVerificacionCrediticia()
     {
         $solicitudesDia = Solicitud::select(
-                        'solicitud.codSolicitud','solicitud.monto','solicitud.motivo','solicitud.fecha',
+                        'solicitud.codSolicitud','solicitud.fecha',
                         'socio.dni','socio.nombre','socio.apePaterno','socio.apeMaterno')
                         ->join("socio","socio.codSocio","solicitud.codSocio")
                         ->where([
@@ -269,6 +272,7 @@ class SolicitudController extends Controller
                                         ->select('garantesolicitud.codGaranteSolicitud','socio.codDistrito','socio.dni','socio.nombre','socio.apePaterno','socio.apeMaterno','socio.fecNacimiento','socio.telefono','socio.domicilio','socio.tipo','socio.activo')
                                         ->where('garantesolicitud.codSolicitud',$cod)
                                         ->get();
+    
 
         $data = [$solicitud,$garantes];
         

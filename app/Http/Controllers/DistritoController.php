@@ -73,4 +73,20 @@ class DistritoController extends Controller
         $distrito->delete();
         return response()->json(null,204);
     }
+    public function ObtenerDistritos($codProvincia)
+    {
+        try
+        {
+            $consulta=Distrito::select('codDistrito','nombre')
+                        ->where('codProvincia',$codProvincia)
+                        ->get();
+            return response($consulta);
+        }
+        catch (\Exception $ex) 
+        {
+            $data = $ex->getMessage();
+            
+            return response($data, 400);
+        }
+    }
 }

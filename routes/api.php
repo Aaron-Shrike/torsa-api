@@ -13,6 +13,7 @@ use App\Http\Controllers\DistritoController;
 use App\Http\Controllers\ProvinciaController;
 use App\Http\Controllers\SolicitudController;
 use App\Http\Controllers\TipoUsuarioController;
+use App\Http\Controllers\VerificarController;
 use App\Models\Departamento;
 use App\Models\Solicitud;
 
@@ -67,5 +68,9 @@ Route::post('validarEmail', 'App\Http\Controllers\UsuarioController@ValidarEmail
 //Rutas de SolicitudController
 Route::get('/listarSolicitudesDia/{codigo}','App\Http\Controllers\SolicitudController@ListarSolicitudesDia');
 Route::post('/solicitud-pendiente-verificacion-crediticia', [SolicitudController::class, 'ListarSolicitudesPendienteDeVerificacionCrediticia']);
+Route::get('/obtener-departamentos', [DepartamentoController::class,'ObtenerDepartamento']);
+Route::get('/obtener-provincias/{codDepartamento}', [ProvinciaController::class,'ObtenerProvincias']);
+Route::get('/obtener-distritos/{codProvincia}', [DistritoController::class,'ObtenerDistritos']);
+Route::post('/verificaciones-solicitud',[VerificarController::class,'VerificacionesSolicitud']);
 Route::post('/anularSolicitudPVC/{codigo}','App\Http\Controllers\SolicitudController@AnularSolicitudPVC');
 Route::post('/consultarDetalleSolicitud/{codigo}','App\Http\Controllers\SolicitudController@ConsultarDetalleSolicitudDeCredito');

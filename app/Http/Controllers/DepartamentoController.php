@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Departamento;
+use Illuminate\Support\Facades\DB;
 
 class DepartamentoController extends Controller
 {
@@ -71,5 +72,23 @@ class DepartamentoController extends Controller
         $departamento = Departamento::findOnFile($id);
         $departamento->delete();
         return response()->json(null,204);
+    }
+
+    public function ObtenerDepartamento()
+    {
+        $data=array();
+        try
+        {
+            $consulta = Departamento::select('departamento.codDepartamento','departamento.nombre')
+                        ->get();
+            
+            return response($consulta);
+        }
+        catch (\Exception $ex) 
+        {
+            $data = $ex->getMessage();
+            
+            return response($data, 400);
+        }
     }
 }
