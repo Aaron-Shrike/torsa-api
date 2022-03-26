@@ -67,45 +67,92 @@ class VerificarController extends Controller
     {
         DB::beginTransaction();
         try {
-            $verificar= Verificar::select('codVerificar','codSolicitud','v1','v2','v3','v4')
-                    ->where('codSolicitud',$request->get('codSolicitud'))
-                    ->first();
-               
+                $solicitud= Solicitud::find($request->get('codSolicitud'));                 
+                $verificar= Verificar::select('codVerificar','codSolicitud','v1','v2','v3','v4','estado')
+                        ->where('codSolicitud',$request->get('codSolicitud'))
+                        ->where('estado',$solicitud->estado)
+                        ->first();
+
+     
                 if(isset($verificar['codSolicitud']))
-               {
-                    if($request->get('v1'))
+                { 
+                    if($verificar['estado']==$solicitud->estado && $verificar['codSolicitud']==$solicitud->codSolicitud)
                     {
-                        $verificar->v1='1';
+                        if($request->get('v1'))
+                        {
+                            $verificar->v1='1';
+                        }
+                        if(!$request->get('v1'))
+                        {
+                            $verificar->v1='0';
+                        }
+                        if($request->get('v2'))
+                        {
+                            $verificar->v2='1';
+                        }
+                        if(!$request->get('v2'))
+                        {
+                            $verificar->v2='0';
+                        }
+                        if($request->get('v3'))
+                        {
+                            $verificar->v3='1';
+                        }
+                        if(!$request->get('v3'))
+                        {
+                            $verificar->v3='0';
+                        }
+                        if($request->get('v4'))
+                        {
+                            $verificar->v4='1';
+                        }
+                        if(!$request->get('v4'))
+                        {
+                            $verificar->v4='0';
+                        }
+                        $verificar->save();
                     }
-                    if(!$request->get('v1'))
+                    else
                     {
-                        $verificar->v1='0';
+                        
+                        $verificar = new Verificar();
+                        $verificar->codSolicitud = $request->get('codSolicitud');
+                        
+                        if($request->get('v1'))
+                        {
+                            $verificar->v1='1';
+                        }
+                        if(!$request->get('v1'))
+                        {
+                            $verificar->v1='0';
+                        }
+                        if($request->get('v2'))
+                        {
+                            $verificar->v2='1';
+                        }
+                        if(!$request->get('v2'))
+                        {
+                            $verificar->v2='0';
+                        }
+                        if($request->get('v3'))
+                        {
+                            $verificar->v3='1';
+                        }
+                        if(!$request->get('v3'))
+                        {
+                            $verificar->v3='0';
+                        }
+                        if($request->get('v4'))
+                        {
+                            $verificar->v4='1';
+                        }
+                        if(!$request->get('v4'))
+                        {
+                            $verificar->v4='0';
+                        }
+                        $verificar->estado =$solicitud->estado;
+                        $verificar->save();
                     }
-                    if($request->get('v2'))
-                    {
-                        $verificar->v2='1';
-                    }
-                    if(!$request->get('v2'))
-                    {
-                        $verificar->v2='0';
-                    }
-                    if($request->get('v3'))
-                    {
-                        $verificar->v3='1';
-                    }
-                    if(!$request->get('v3'))
-                    {
-                        $verificar->v3='0';
-                    }
-                    if($request->get('v4'))
-                    {
-                        $verificar->v4='1';
-                    }
-                    if(!$request->get('v4'))
-                    {
-                        $verificar->v4='0';
-                    }
-                    $verificar->save();
                }
                else
                {
@@ -144,7 +191,7 @@ class VerificarController extends Controller
                     {
                         $verificar->v4='0';
                     }
-
+                    $verificar->estado =$solicitud->estado;
                     $verificar->save();
                 }
         DB::commit();

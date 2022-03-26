@@ -101,6 +101,95 @@ class SocioController extends Controller
     {
         //
     }
+    public function BuscarGaranteHabilitado($dni)
+    {
+        try
+        {
+            $data=array();
+            $error = 
+            [
+                'error' => true,
+                'mensaje' => ""
+            ];
+            //Busca socio por el dni
+            $socio = Socio::select("socio.codSocio","socio.dni","socio.nombre","socio.apePaterno","socio.apeMaterno",
+                    "socio.fecNacimiento","socio.telefono","socio.domicilio","socio.tipo", "socio.activo")
+                    ->where([
+                        "socio.dni"=>$dni,
+                    ])
+                    ->first();
+
+            if(isset($socio['dni']))
+            {  
+                if($socio['activo'] == "1")
+                {
+                    $data = 
+                    [
+                        'codSocio' => $socio['codSocio'],
+                        'dni' => $socio['dni'],
+                        'nombre'=> $socio['nombre'],
+                        'apePaterno'=> $socio['apePaterno'],
+                        'apeMaterno'=> $socio['apeMaterno'],
+                        'fecNacimiento'=> $socio['fecNacimiento'],
+                        'telefono'=> $socio['telefono'],
+                        'domicilio'=> $socio['domicilio'],
+                        'tipo'=> $socio['tipo'],
+                        'activo'=> $socio['activo'],
+                    ]; 
+                    $verificaGarante = GaranteSolicitud::select('solicitud.estado','garantesolicitud.codSocio','solicitud.fecha')
+                    ->join('solicitud','solicitud.codSolicitud','garantesolicitud.codSolicitud')
+                    ->join('socio','socio.codSocio','garantesolicitud.codSocio')
+                    ->where('garantesolicitud.codSocio','=',$socio['codSocio'])
+                    ->orderBy('solicitud.fecha','desc')
+                    ->first();
+                    if(isset($verificaGarante['codSocio']))
+                    {
+                        if($verificaGarante['estado']=='REC' or $verificaGarante['estado']=='ANU')
+                        {
+
+                            return response($data);
+                        } 
+                        else
+                        {
+                            $error = 
+                            [
+                                'estado' =>  $verificaGarante['estado'],
+                                'fecha' =>  $verificaGarante['fecha'],
+                            ];
+                            $error['mensaje'] = "Es garante de una solicitud pendiente.";
+                            return response($error);
+                        }           
+                    }
+                    else
+                    {
+                        return response($data);
+                    }
+                
+                }
+                else
+                {
+                    $error['mensaje'] = $socio['tipo'] ." inactivo.";
+
+                    return response($error); 
+                }
+            }
+            else
+            {
+                $error['mensaje'] = "DNI no registrado. ¡Ingrese los datos!";
+                $error['error'] = false;
+
+                return response($error);
+            } 
+
+        }
+        catch(\Exception $e)
+        {
+            $mensaje = $e->getMessage();
+
+            return response($mensaje, 500);
+        }
+
+    }
     public function BuscarSocioGaranteHabilitado($dni)
     {
         try
