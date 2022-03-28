@@ -264,7 +264,11 @@ class SolicitudController extends Controller
                                 ->join('socio','solicitud.codSocio','=','socio.codSocio')
                                 ->select('solicitud.codSolicitud','solicitud.monto','solicitud.motivo','solicitud.fecha','solicitud.estado',
                                 'usuario.codTipoUsuario','usuario.codTrabajador','usuario.dni','usuario.activo',
-                                'socio.codDistrito','socio.dni','socio.nombre','socio.apePaterno','socio.apeMaterno','socio.fecNacimiento','socio.telefono','socio.domicilio','socio.tipo','socio.activo')
+                                'socio.codDistrito','socio.dni','socio.nombre','socio.apePaterno','socio.apeMaterno','socio.fecNacimiento','socio.telefono','socio.domicilio','socio.tipo','socio.activo',
+                                'distrito.nombre AS distrito', 'provincia.nombre AS provincia', 'departamento.nombre AS departamento')
+                                ->join('distrito', 'socio.codDistrito','=','distrito.codDistrito')
+                                ->join('provincia', 'distrito.codProvincia','=','provincia.codProvincia')
+                                ->join('departamento', 'provincia.codDepartamento','=','departamento.codDepartamento')
                                 ->where('solicitud.codSolicitud', $cod)
                                 ->first();
 
