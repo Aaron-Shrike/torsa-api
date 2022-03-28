@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <script src="https://kit.fontawesome.com/dc2d432183.js" crossorigin="anonymous"></script>
     <title>Registro de Usuario</title>
 </head>
 <body>
@@ -23,36 +24,37 @@
             <h3>Contactenos:</h3>
             
             <div>
-                <i class="fa-solid fa-location-dot"></i>
+                
                 <p>
+                    <i class="fa-solid fa-location-dot"></i>
                     Jr. Alfonso Ugarte N° 696(Esquina Elias Aguirre) <br>
-                    Av. Independencia N° 766 - CPM. San Antonio <br>
-                    Chiclayo Lambayeque Perú
+                    &nbsp;&nbsp;&nbsp;Av. Independencia N° 766 - CPM. San Antonio <br>
+                    &nbsp;&nbsp;&nbsp;Chiclayo Lambayeque Perú
                 </p> 
             </div>
             
             <div>
-                <i class="fa-solid fa-f"></i>
+                <i class="fa-brands fa-facebook"></i>
                 <a href="https://www.facebook.com/torsaperu/?ref=page_internal">TorsaPerú</a> 
             </div>
 
             <div>
-                <i class="fa-solid fa-link"></i>
+                <i class="fa-solid fa-globe"></i>
                 <a href="https://torsaperublog.wordpress.com/?fbclid=IwAR1oS_-By1A5qqZAu9Jb9uO5H7EZee5mKMXBtdy743ELr5c_ZwRWxsTemrg">Página Oficial</a>
             </div>
 
             <div>
-                <i class="fa-solid fa-envelope"></i>
+                <i class="fa-solid fa-at"></i>
                 torsaperu@gmail.com
             </div>
             
             <div>
-                <i class="fa-solid fa-mobile-screen"></i>
+                <i class="fa-brands fa-whatsapp"></i>
                 921 841 090
             </div>
             
             <div>
-                <i class="fa-solid fa-phone"></i>
+                <i class="fa-regular fa-phone"></i>
                 (074) 235195
             </div>
             
