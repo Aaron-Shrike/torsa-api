@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\GaranteSolicitud;
 use App\Models\Socio;
 use App\Models\Solicitud;
+use App\Models\Verificar;
 use App\Models\Usuario;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
@@ -276,9 +277,14 @@ class SolicitudController extends Controller
                                         ->select('garantesolicitud.codGaranteSolicitud','socio.codDistrito','socio.dni','socio.nombre','socio.apePaterno','socio.apeMaterno','socio.fecNacimiento','socio.telefono','socio.domicilio','socio.tipo','socio.activo')
                                         ->where('garantesolicitud.codSolicitud',$cod)
                                         ->get();
+
+        $verificacion = Verificar::select('verificar.v1','verificar.v2','verificar.v3','verificar.v4')
+                                        ->where('verificar.codSolicitud',$cod)
+                                        ->where('verificar.estado',$solicitud->estado)
+                                        ->first();
     
 
-        $data = [$solicitud,$garantes];
+        $data = [$solicitud,$garantes,$verificacion];
         
         return response()->json($data,200);
     }
