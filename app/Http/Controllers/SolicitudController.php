@@ -206,6 +206,7 @@ class SolicitudController extends Controller
             return response($mensaje, 500);
         }
     }
+
     public function ValidarTelefonoSocioGarante($telefono)
     {
         $consulta = Socio::where('socio.telefono','=',$telefono)
@@ -213,6 +214,7 @@ class SolicitudController extends Controller
 
         return response()->json($consulta, 200);
     }
+
     public function ListarSolicitudesDia($codigo)
     {
         $fechaAyer=  Carbon::yesterday();
@@ -233,7 +235,8 @@ class SolicitudController extends Controller
     }
 
     //Vamos a Anular una  solicitud que se encuentre en estado de Pendiente de Verificación Crediticia en la vista de Lista de Solicitudes Diaria
-    public function AnularSolicitudPVC($id){
+    public function AnularSolicitudPVC($id)
+    {
         $solicitud = Solicitud::findOrFail($id);
 
         $solicitud->estado = 'ANU';
@@ -246,43 +249,52 @@ class SolicitudController extends Controller
     public function ListarSolicitudesPendienteDeVerificacionCrediticia()
     {
         $solicitudesDia = Solicitud::select(
-                        'solicitud.codSolicitud','solicitud.fecha',
-                        'socio.dni','socio.nombre','socio.apePaterno','socio.apeMaterno')
-                        ->join("socio","socio.codSocio","solicitud.codSocio")
-                        ->where([
-                            'solicitud.estado'=>'PVC'
-                            ])
-                            ->orderBy('solicitud.fecha','asc')
-                            ->get();
+            'solicitud.codSolicitud','solicitud.fecha',
+            DB::raw('date_format(solicitud.fecha, "%d/%m/%Y") AS formatoFecha'),
+            'socio.dni','socio.nombre','socio.apePaterno','socio.apeMaterno')
+            ->join("socio","socio.codSocio","solicitud.codSocio")
+            ->where([
+                'solicitud.estado'=>'PVC'
+                ])
+            ->orderBy('solicitud.fecha','asc')
+            ->get();
+
         return response()->json($solicitudesDia,200);
     }
 
-    public function ConsultarDetalleSolicitudDeCredito($cod){
-
+    public function ConsultarDetalleSolicitudDeCredito($cod)
+    {
         $data = array();
 
-        $solicitud = Solicitud::join('usuario','solicitud.codUsuario','=','usuario.codUsuario')
-                                ->join('socio','solicitud.codSocio','=','socio.codSocio')
-                                ->select('solicitud.codSolicitud','solicitud.monto','solicitud.motivo','solicitud.fecha','solicitud.estado',
-                                'usuario.codTipoUsuario','usuario.codTrabajador','usuario.dni','usuario.activo',
-                                'socio.codDistrito','socio.dni','socio.nombre','socio.apePaterno','socio.apeMaterno','socio.fecNacimiento','socio.telefono','socio.domicilio','socio.tipo','socio.activo',
-                                'distrito.nombre AS distrito', 'provincia.nombre AS provincia', 'departamento.nombre AS departamento')
-                                ->join('distrito', 'socio.codDistrito','=','distrito.codDistrito')
-                                ->join('provincia', 'distrito.codProvincia','=','provincia.codProvincia')
-                                ->join('departamento', 'provincia.codDepartamento','=','departamento.codDepartamento')
-                                ->where('solicitud.codSolicitud', $cod)
-                                ->first();
+        $solicitud = Solicitud::select('solicitud.codSolicitud', 
+            DB::raw('FORMAT(solicitud.monto, 2) AS monto'), 'solicitud.motivo', 'solicitud.fecha', 
+            DB::raw('date_format(solicitud.fecha, "%d/%m/%Y") AS formatoFecha'), 'solicitud.estado', 
+            'usuario.codTipoUsuario','usuario.codTrabajador','usuario.dni', 'usuario.activo', 
+            'socio.codDistrito','socio.dni','socio.nombre','socio.apePaterno', 'socio.apeMaterno',
+            'socio.fecNacimiento', 
+            DB::raw('date_format(socio.fecNacimiento, "%d/%m/%Y") AS formatoFechaNacimiento'),
+            'socio.telefono', 'socio.domicilio','socio.tipo', 'socio.activo', 
+            'distrito.nombre AS distrito', 'provincia.nombre AS provincia', 
+            'departamento.nombre AS departamento')
+            ->join('usuario','solicitud.codUsuario','=','usuario.codUsuario')
+            ->join('socio','solicitud.codSocio','=','socio.codSocio')
+            ->join('distrito', 'socio.codDistrito','=','distrito.codDistrito')
+            ->join('provincia', 'distrito.codProvincia','=','provincia.codProvincia')
+            ->join('departamento', 'provincia.codDepartamento','=','departamento.codDepartamento')
+            ->where('solicitud.codSolicitud', $cod)
+            ->first();
 
-        $garantes = GaranteSolicitud::join('socio','garantesolicitud.codSocio','=','socio.codSocio')
-                                        ->select('garantesolicitud.codGaranteSolicitud','socio.codDistrito','socio.dni','socio.nombre','socio.apePaterno','socio.apeMaterno','socio.fecNacimiento','socio.telefono','socio.domicilio','socio.tipo','socio.activo')
-                                        ->where('garantesolicitud.codSolicitud',$cod)
-                                        ->get();
+        $garantes = GaranteSolicitud::select('garantesolicitud.codGaranteSolicitud', 
+            'socio.codDistrito','socio.dni','socio.nombre','socio.apePaterno','socio.apeMaterno',
+            'socio.fecNacimiento','socio.telefono','socio.domicilio','socio.tipo','socio.activo')
+            ->join('socio','garantesolicitud.codSocio','=','socio.codSocio')
+            ->where('garantesolicitud.codSolicitud',$cod)
+            ->get();
 
         $verificacion = Verificar::select('verificar.v1','verificar.v2','verificar.v3','verificar.v4')
-                                        ->where('verificar.codSolicitud',$cod)
-                                        ->where('verificar.estado',$solicitud->estado)
-                                        ->first();
-    
+            ->where('verificar.codSolicitud',$cod)
+            ->where('verificar.estado',$solicitud->estado)
+            ->first();
 
         $data = [$solicitud,$garantes,$verificacion];
         
