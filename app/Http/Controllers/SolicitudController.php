@@ -220,7 +220,7 @@ class SolicitudController extends Controller
         $fechaAyer=  Carbon::yesterday();
 
         $solicitudesDia = Solicitud::select('solicitud.codSolicitud','solicitud.codUsuario',
-                        'solicitud.codSocio','solicitud.monto','solicitud.motivo','solicitud.fecha','solicitud.estado',
+                        'solicitud.codSocio',DB::raw('FORMAT(solicitud.monto, 2) AS monto'),'solicitud.motivo','solicitud.fecha','solicitud.estado',
                         'socio.codSocio','socio.dni','socio.nombre','socio.apePaterno','socio.apeMaterno','socio.telefono')
                         ->join("usuario","usuario.codUsuario","solicitud.codUsuario")
                         ->join("socio","socio.codSocio","solicitud.codSocio")
