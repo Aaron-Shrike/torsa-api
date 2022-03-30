@@ -11,7 +11,7 @@ class Verificar extends Model
 
     protected $primaryKey = "codVerificar"; 
     protected $table = "verificar"; 
-    protected $fillable = ['codSolicitud','v1','v2','v3','v4'];    
+    protected $fillable = ['codSolicitud','v1','v2','v3','v4','estado'];    
 
     public $timestamps = false;
 }
