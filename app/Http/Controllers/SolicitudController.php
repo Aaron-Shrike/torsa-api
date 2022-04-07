@@ -300,4 +300,37 @@ class SolicitudController extends Controller
         
         return response()->json($data,200);
     }
+    public function AceptarSolicitudPVC(Request $request)
+    {
+        $verificacionesCumplidas = Verificar::select('v1','v2','v3')
+        ->where('codSolicitud',$request['datos']['codSolicitud'])
+        ->where('estado','PVC')
+        ->first();
+        $solicitudPVC = Solicitud::find($request['datos']['codSolicitud']);
+        
+        if($solicitudPVC->estado=='PVC' && $verificacionesCumplidas['v1'] && $verificacionesCumplidas['v2'] && $verificacionesCumplidas['v3'])
+        {
+            $solicitudPVC->estado = 'PVD';
+            $solicitudPVC->save();
+            return response()->json( "Actualizado a PVD" ,200);
+        }
+    }
+    public function RechazarSolicitudPVC(Request $request)
+    {
+        $solicitudPVC = Solicitud::find($request['datos']['codSolicitud']);
+        $verificacionesIncumplidas = Verificar::select('v1','v2','v3')
+        ->where('codSolicitud',$request['datos']['codSolicitud'])
+        ->where('estado','PVC')
+        ->first();
+        if($solicitudPVC->estado=='PVC')
+        {
+            if(!($verificacionesIncumplidas['v1']) or !($verificacionesIncumplidas['v2']) or !($verificacionesIncumplidas['v3']))
+            {
+                $solicitudPVC->estado = 'REC';
+                $solicitudPVC->save();
+                return response()->json("Actualizado a Rechazado" ,200);
+            }
+        }
+    }
+
 }
