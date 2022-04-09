@@ -74,5 +74,5 @@ Route::get('/obtener-distritos/{codProvincia}', [DistritoController::class,'Obte
 Route::post('/verificaciones-solicitud',[VerificarController::class,'VerificacionesSolicitud']);
 Route::post('/anularSolicitudPVC/{codigo}','App\Http\Controllers\SolicitudController@AnularSolicitudPVC');
 Route::post('/consultarDetalleSolicitud/{codigo}','App\Http\Controllers\SolicitudController@ConsultarDetalleSolicitudDeCredito');
-Route::post('/aceptar-solicitud-pvc', [SolicitudController::class, 'AceptarSolicitudPVC']);
+Route::post('/aprobar-solicitud-pvc', [SolicitudController::class, 'AprobarSolicitudPVC']);
 Route::post('/rechazar-solicitud-pvc', [SolicitudController::class, 'RechazarSolicitudPVC']);
