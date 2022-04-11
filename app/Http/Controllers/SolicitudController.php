@@ -14,6 +14,7 @@ use App\Http\Controllers\SocioController;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Route;
 use App\Http\Controllers\UsuarioController;
+use Illuminate\Support\Arr;
 
 class SolicitudController extends Controller
 {
@@ -235,12 +236,12 @@ class SolicitudController extends Controller
     }
 
     //Vamos a Anular una  solicitud que se encuentre en estado de Pendiente de Verificación Crediticia en la vista de Lista de Solicitudes Diaria
-    public function AnularSolicitudPVC($id)
+    public function AnularSolicitudPVC($id,Request $request)
     {
         $solicitud = Solicitud::findOrFail($id);
 
         $solicitud->estado = 'ANU';
-
+        $solicitud->motAnulado = $request->get('motivo');
         $solicitud->save();
 
         return response()->json($solicitud,200);
@@ -248,18 +249,41 @@ class SolicitudController extends Controller
 
     public function ListarSolicitudesPendienteDeVerificacionCrediticia()
     {
-        $solicitudesDia = Solicitud::select(
-            'solicitud.codSolicitud','solicitud.fecha',
+        $data = array();
+        $snr = array();
+        $consulta1 = Verificar::select('verificar.estado','verificar.codSolicitud','verificar.codVerificar')
+                                ->join('solicitud','solicitud.codSolicitud','verificar.codSolicitud')
+                                ->get();
+
+        $solicitudesRevisadas = Verificar::select(
+            'verificar.codSolicitud','solicitud.fecha',
             DB::raw('date_format(solicitud.fecha, "%d/%m/%Y") AS formatoFecha'),
             'socio.dni','socio.nombre','socio.apePaterno','socio.apeMaterno')
+            ->join('solicitud','solicitud.codSolicitud','verificar.codSolicitud')
             ->join("socio","socio.codSocio","solicitud.codSocio")
             ->where([
-                'solicitud.estado'=>'PVC'
+                'verificar.estado'=>'PVC'
                 ])
             ->orderBy('solicitud.fecha','asc')
             ->get();
 
-        return response()->json($solicitudesDia,200);
+            $solicitudesNoRevisadas = Solicitud::select(
+                'solicitud.codSolicitud','solicitud.fecha',
+                DB::raw('date_format(solicitud.fecha, "%d/%m/%Y") AS formatoFecha'),
+                'socio.dni','socio.nombre','socio.apePaterno','socio.apeMaterno')
+                ->join("socio","socio.codSocio","solicitud.codSocio")
+                ->join("verificar","verificar.codSolicitud","solicitud.codSolicitud")
+                ->where([
+                    'solicitud.estado'=>'PVC'
+                    ])
+                ->where('solicitud.codSolicitud', '!==', 'verificar.codSolicitud')
+                ->orderBy('solicitud.fecha','asc')
+                ->get();
+
+                $data = [$solicitudesRevisadas,$solicitudesNoRevisadas];
+                return response()->json($data,200);
+           
+        
     }
 
     public function ConsultarDetalleSolicitudDeCredito($cod)
