@@ -250,37 +250,50 @@ class SolicitudController extends Controller
     public function ListarSolicitudesPendienteDeVerificacionCrediticia()
     {
         $data = array();
-        $snr = array();
-        $consulta1 = Verificar::select('verificar.estado','verificar.codSolicitud','verificar.codVerificar')
+        
+        $consulta3R = Verificar::select('verificar.estado','verificar.codSolicitud','verificar.codVerificar')
                                 ->join('solicitud','solicitud.codSolicitud','verificar.codSolicitud')
+                                ->join("socio","socio.codSocio","solicitud.codSocio")
+                                ->select('verificar.codSolicitud','solicitud.fecha',
+                                DB::raw('date_format(solicitud.fecha, "%d/%m/%Y") AS formatoFecha'),
+                                'socio.dni','socio.nombre','socio.apePaterno','socio.apeMaterno')
+                                ->where([
+                                    'verificar.estado'=>'PVC',
+                                    ['verificar.v1', '!=', 'NR'], 
+                                    ['verificar.v2', '!=', 'NR'], 
+                                    ['verificar.v3', '!=', 'NR'],
+                                    ])
+                                ->orderBy('solicitud.fecha','asc')
                                 ->get();
 
-        $solicitudesRevisadas = Verificar::select(
-            'verificar.codSolicitud','solicitud.fecha',
-            DB::raw('date_format(solicitud.fecha, "%d/%m/%Y") AS formatoFecha'),
-            'socio.dni','socio.nombre','socio.apePaterno','socio.apeMaterno')
-            ->join('solicitud','solicitud.codSolicitud','verificar.codSolicitud')
-            ->join("socio","socio.codSocio","solicitud.codSocio")
-            ->where([
-                'verificar.estado'=>'PVC'
-                ])
-            ->orderBy('solicitud.fecha','asc')
-            ->get();
+         $consulta2R = Verificar::select('verificar.estado','verificar.codSolicitud','verificar.codVerificar')
+                                ->join('solicitud','solicitud.codSolicitud','verificar.codSolicitud')
+                                ->join("socio","socio.codSocio","solicitud.codSocio")
+                                ->select('verificar.codSolicitud','solicitud.fecha',
+                                DB::raw('date_format(solicitud.fecha, "%d/%m/%Y") AS formatoFecha'),
+                                'socio.dni','socio.nombre','socio.apePaterno','socio.apeMaterno')
+                                ->where([
+                                    'verificar.estado'=>'PVC',
+                                    ['verificar.v1', '!=', 'NR', '&&', 'verificar.v2', '!=', 'NR', '&&', 'verificar.v3', '==', 'NR'],
+                                ])
+                                ->orderBy('solicitud.fecha','asc')
+                                ->get();
 
-            $solicitudesNoRevisadas = Solicitud::select(
-                'solicitud.codSolicitud','solicitud.fecha',
-                DB::raw('date_format(solicitud.fecha, "%d/%m/%Y") AS formatoFecha'),
-                'socio.dni','socio.nombre','socio.apePaterno','socio.apeMaterno')
-                ->join("socio","socio.codSocio","solicitud.codSocio")
-                ->join("verificar","verificar.codSolicitud","solicitud.codSolicitud")
-                ->where([
-                    'solicitud.estado'=>'PVC'
-                    ])
-                ->where('solicitud.codSolicitud', '!==', 'verificar.codSolicitud')
-                ->orderBy('solicitud.fecha','asc')
-                ->get();
+            // $solicitudesNoRevisadas = Solicitud::select(
+            //     'solicitud.codSolicitud','solicitud.fecha',
+            //     DB::raw('date_format(solicitud.fecha, "%d/%m/%Y") AS formatoFecha'),
+            //     'socio.dni','socio.nombre','socio.apePaterno','socio.apeMaterno')
+            //     ->join("socio","socio.codSocio","solicitud.codSocio")
+            //     ->join("verificar","verificar.codSolicitud","solicitud.codSolicitud")
+            //     ->where([
+            //         'solicitud.estado'=>'PVC'
+            //         ])
+            //     ->where('solicitud.codSolicitud', '!==', 'verificar.codSolicitud')
+            //     ->orderBy('solicitud.fecha','asc')
+            //     ->get();
 
-                $data = [$solicitudesRevisadas,$solicitudesNoRevisadas];
+                $data = [$consulta3R,$consulta2R];
+                $data = array_unique($data);
                 return response()->json($data,200);
            
         
