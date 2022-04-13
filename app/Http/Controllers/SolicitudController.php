@@ -16,6 +16,8 @@ use App\Http\Controllers\Route;
 use App\Http\Controllers\UsuarioController;
 use Illuminate\Support\Arr;
 
+use function PHPUnit\Framework\arrayHasKey;
+
 class SolicitudController extends Controller
 {
     /**
@@ -251,49 +253,80 @@ class SolicitudController extends Controller
     {
         $data = array();
         
-        $consulta3R = Verificar::select('verificar.estado','verificar.codSolicitud','verificar.codVerificar')
+        $consultaSA = Verificar::select('verificar.estado','verificar.codSolicitud','verificar.codVerificar',DB::raw('date_format(solicitud.fecha, "%d/%m/%Y") AS formatoFecha'),
+                                'socio.dni','socio.nombre','socio.apePaterno','socio.apeMaterno')
                                 ->join('solicitud','solicitud.codSolicitud','verificar.codSolicitud')
                                 ->join("socio","socio.codSocio","solicitud.codSocio")
-                                ->select('verificar.codSolicitud','solicitud.fecha',
-                                DB::raw('date_format(solicitud.fecha, "%d/%m/%Y") AS formatoFecha'),
-                                'socio.dni','socio.nombre','socio.apePaterno','socio.apeMaterno')
                                 ->where([
                                     'verificar.estado'=>'PVC',
-                                    ['verificar.v1', '!=', 'NR'], 
-                                    ['verificar.v2', '!=', 'NR'], 
-                                    ['verificar.v3', '!=', 'NR'],
                                     ])
+                                ->where(['verificar.v1' => 'AP'])
+                                ->where(['verificar.v2' => 'AP'])
+                                ->where(['verificar.v3' => 'AP'])
                                 ->orderBy('solicitud.fecha','asc')
                                 ->get();
 
-         $consulta2R = Verificar::select('verificar.estado','verificar.codSolicitud','verificar.codVerificar')
+        $consultaSNA = Verificar::select('verificar.estado','verificar.codSolicitud','verificar.codVerificar',DB::raw('date_format(solicitud.fecha, "%d/%m/%Y") AS formatoFecha'),
+                                'socio.dni','socio.nombre','socio.apePaterno','socio.apeMaterno')
                                 ->join('solicitud','solicitud.codSolicitud','verificar.codSolicitud')
                                 ->join("socio","socio.codSocio","solicitud.codSocio")
-                                ->select('verificar.codSolicitud','solicitud.fecha',
-                                DB::raw('date_format(solicitud.fecha, "%d/%m/%Y") AS formatoFecha'),
-                                'socio.dni','socio.nombre','socio.apePaterno','socio.apeMaterno')
                                 ->where([
                                     'verificar.estado'=>'PVC',
-                                    ['verificar.v1', '!=', 'NR', '&&', 'verificar.v2', '!=', 'NR', '&&', 'verificar.v3', '==', 'NR'],
                                 ])
+                                ->where(['verificar.v1' => 'NA'])->orwhere(['verificar.v2' => 'NA'])->orwhere(['verificar.v3' => 'NA'])
                                 ->orderBy('solicitud.fecha','asc')
                                 ->get();
 
-            // $solicitudesNoRevisadas = Solicitud::select(
-            //     'solicitud.codSolicitud','solicitud.fecha',
-            //     DB::raw('date_format(solicitud.fecha, "%d/%m/%Y") AS formatoFecha'),
-            //     'socio.dni','socio.nombre','socio.apePaterno','socio.apeMaterno')
-            //     ->join("socio","socio.codSocio","solicitud.codSocio")
-            //     ->join("verificar","verificar.codSolicitud","solicitud.codSolicitud")
-            //     ->where([
-            //         'solicitud.estado'=>'PVC'
-            //         ])
-            //     ->where('solicitud.codSolicitud', '!==', 'verificar.codSolicitud')
-            //     ->orderBy('solicitud.fecha','asc')
-            //     ->get();
+        $consultaNAND = Verificar::select('verificar.estado','verificar.codSolicitud','verificar.codVerificar',DB::raw('date_format(solicitud.fecha, "%d/%m/%Y") AS formatoFecha'),
+                                'socio.dni','socio.nombre','socio.apePaterno','socio.apeMaterno')
+                                ->join('solicitud','solicitud.codSolicitud','verificar.codSolicitud')
+                                ->join("socio","socio.codSocio","solicitud.codSocio")
+                                ->where([
+                                    'verificar.estado'=>'PVC',
+                                ])
+                                ->whereIn(
+                                    'verificar.v1',['AP','PR']  
+                                )
+                                ->whereIn(
+                                    'verificar.v2',['AP','PR']  
+                                )
+                                ->whereIn(
+                                    'verificar.v3',['AP','PR']  
+                                )
+                                ->orderBy('solicitud.fecha','asc')
+                                ->get();
+            $diffA3A1 = array();
+            $diffA3A1 = $consultaNAND->diff($consultaSA);
 
-                $data = [$consulta3R,$consulta2R];
-                $data = array_unique($data);
+
+            // --- DIFERENCIA ENTRE SOLICITUDES DE LA TABLA SOLICITUS MENOS LAS DE LA TABLA VERIFICAR ---
+            $solicitudesV = Verificar::select('verificar.estado','verificar.codSolicitud','verificar.codVerificar',DB::raw('date_format(solicitud.fecha, "%d/%m/%Y") AS formatoFecha'),
+            'socio.dni','socio.nombre','socio.apePaterno','socio.apeMaterno')
+            ->join('solicitud','solicitud.codSolicitud','verificar.codSolicitud')
+            ->join("socio","socio.codSocio","solicitud.codSocio")
+            ->where([
+                'verificar.estado'=>'PVC',
+                ])
+            ->orderBy('solicitud.fecha','asc')
+            ->get();
+
+            $solicitudesNoRevisadas = Solicitud::select(
+                'solicitud.codSolicitud','solicitud.fecha',
+                 DB::raw('date_format(solicitud.fecha, "%d/%m/%Y") AS formatoFecha'),
+                'socio.dni','socio.nombre','socio.apePaterno','socio.apeMaterno')
+            ->join("socio","socio.codSocio","solicitud.codSocio")
+            ->join("verificar","verificar.codSolicitud","solicitud.codSolicitud")
+            ->where([
+                'solicitud.estado'=>'PVC'
+            ])
+            ->orderBy('solicitud.fecha','asc')
+            ->get();
+            
+            $diffTSTV = array();
+
+            $diffTSTV = $solicitudesNoRevisadas['codSolicitud']->diff($solicitudesV['codSolicitud']);
+
+                $data = [$diffTSTV];
                 return response()->json($data,200);
            
         
