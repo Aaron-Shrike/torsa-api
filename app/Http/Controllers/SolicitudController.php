@@ -470,6 +470,23 @@ class SolicitudController extends Controller
         
     }
 
+    public function ListarSolicitudesPreAprobadas(){
+        $data = array();
+        $solicitudesPA = Solicitud::select(
+            'solicitud.codSolicitud','solicitud.fecha',
+             DB::raw('date_format(solicitud.fecha, "%d/%m/%Y") AS formatoFecha'),
+            'socio.dni','socio.nombre','socio.apePaterno','socio.apeMaterno')
+        ->join("socio","socio.codSocio","solicitud.codSocio")
+        ->where([
+            'solicitud.estado'=>'PAC'
+        ])
+        ->orderBy('solicitud.fecha','asc')
+        ->get();
+
+        $data = [$solicitudesPA];
+            return response()->json($data,200);
+    }
+
     public function ConsultarDetalleSolicitudDeCredito($cod)
     {
         $data = array();
@@ -508,6 +525,7 @@ class SolicitudController extends Controller
         
         return response()->json($data,200);
     }
+    
     public function AprobarSolicitudPVC(Request $request)
     {
         try 
