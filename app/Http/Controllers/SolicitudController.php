@@ -487,6 +487,23 @@ class SolicitudController extends Controller
             return response()->json($data,200);
     }
 
+    public function ListarSolicitudesAprobadas(){
+        $data = array();
+        $solicitudesA = Solicitud::select(
+            'solicitud.codSolicitud','solicitud.fecha',
+             DB::raw('date_format(solicitud.fecha, "%d/%m/%Y") AS formatoFecha'),
+            'socio.dni','socio.nombre','socio.apePaterno','socio.apeMaterno')
+        ->join("socio","socio.codSocio","solicitud.codSocio")
+        ->where([
+            'solicitud.estado'=>'ACE'
+        ])
+        ->orderBy('solicitud.fecha','asc')
+        ->get();
+
+        $data = [$solicitudesA];
+            return response()->json($data,200);
+    }
+
     public function ConsultarDetalleSolicitudDeCredito($cod)
     {
         $data = array();
@@ -522,6 +539,45 @@ class SolicitudController extends Controller
             ->first();
 
         $data = [$solicitud,$garantes,$verificacion];
+        
+        return response()->json($data,200);
+    }
+
+    public function ConsultarDetalleSolicitudAprobada($cod)
+    {
+        $data = array();
+
+        $solicitud = Solicitud::select('solicitud.codSolicitud', 
+            DB::raw('FORMAT(solicitud.monto, 2) AS monto'), 'solicitud.motivo', 'solicitud.fecha', 
+            DB::raw('date_format(solicitud.fecha, "%d/%m/%Y") AS formatoFecha'), 'solicitud.estado', 
+            'usuario.codTipoUsuario','usuario.codTrabajador','usuario.dni', 'usuario.activo', 
+            'socio.codDistrito','socio.dni','socio.nombre','socio.apePaterno', 'socio.apeMaterno',
+            'socio.fecNacimiento', 
+            DB::raw('date_format(socio.fecNacimiento, "%d/%m/%Y") AS formatoFechaNacimiento'),
+            'socio.telefono', 'socio.domicilio','socio.tipo', 'socio.activo', 
+            'distrito.nombre AS distrito', 'provincia.nombre AS provincia', 
+            'departamento.nombre AS departamento')
+            ->join('usuario','solicitud.codUsuario','=','usuario.codUsuario')
+            ->join('socio','solicitud.codSocio','=','socio.codSocio')
+            ->join('distrito', 'socio.codDistrito','=','distrito.codDistrito')
+            ->join('provincia', 'distrito.codProvincia','=','provincia.codProvincia')
+            ->join('departamento', 'provincia.codDepartamento','=','departamento.codDepartamento')
+            ->where('solicitud.codSolicitud', $cod)
+            ->first();
+
+        $garantes = GaranteSolicitud::select('garantesolicitud.codGaranteSolicitud', 
+            'socio.codDistrito','socio.dni','socio.nombre','socio.apePaterno','socio.apeMaterno',
+            'socio.fecNacimiento','socio.telefono','socio.domicilio','socio.tipo','socio.activo')
+            ->join('socio','garantesolicitud.codSocio','=','socio.codSocio')
+            ->where('garantesolicitud.codSolicitud',$cod)
+            ->get();
+
+        $verificaciones = Verificar::select('verificar.v1','verificar.v2','verificar.v3','verificar.v4','verificar.estado')
+            ->where('verificar.codSolicitud',$cod)
+            ->whereIn('verificar.estado',['PVC','PVD'])
+            ->get();
+
+        $data = [$solicitud,$garantes,$verificaciones];
         
         return response()->json($data,200);
     }
@@ -601,21 +657,28 @@ class SolicitudController extends Controller
 
     public function AprobarSolicitudPAC(Request $request)
     {
+        $data = array();
         try 
         {
-            $verificacionesCumplidas = Verificar::select('v1','v2','v3','v4')
+            $verificacionesCumplidasPVC = Verificar::select('v1','v2','v3')
                 ->where('codSolicitud',$request['codSolicitud'])
-                ->where('estado','PAC')
+                ->where('estado','PVC')
+                ->first();
+            $verificacionesCumplidasPVD = Verificar::select('v1','v2','v3')
+                ->where('codSolicitud',$request['codSolicitud'])
+                ->where('estado','PVD')
                 ->first();
             $solicitudPVC = Solicitud::find($request['codSolicitud']);
             
-            if($solicitudPVC->estado=='PVD' && $verificacionesCumplidas['v1'] == 'AP' && $verificacionesCumplidas['v2'] == 'AP' && $verificacionesCumplidas['v3'] == 'AP' && $verificacionesCumplidas['v4'] == 'AP')
+            if(($solicitudPVC->estado=='PVC' && $verificacionesCumplidasPVC['v1'] == 'AP' && $verificacionesCumplidasPVC['v2'] == 'AP' && $verificacionesCumplidasPVC['v3'] == 'AP')&&
+                ($solicitudPVC->estado=='PVD' && $verificacionesCumplidasPVD['v1'] == 'AP' && $verificacionesCumplidasPVD['v2'] == 'AP' && $verificacionesCumplidasPVD['v3'] == 'AP'))
             {
                 $solicitudPVC->estado = 'ACE';
                 $solicitudPVC->save();
                 return response()->json( "Actualizado a ACE" ,200);
             }
-            return response()->json($verificacionesCumplidas);
+            $data = [$verificacionesCumplidasPVC,$verificacionesCumplidasPVD];
+            return response()->json($data);
         } 
         catch (\Exception $e) 
         {

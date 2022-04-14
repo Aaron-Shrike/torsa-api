@@ -70,12 +70,14 @@ Route::get('/listarSolicitudesDia/{codigo}','App\Http\Controllers\SolicitudContr
 Route::post('/solicitud-pendiente-verificacion-crediticia', [SolicitudController::class, 'ListarSolicitudesPendienteDeVerificacionCrediticia']);
 Route::post('/solicitud-pendiente-verificacion-datos', [SolicitudController::class, 'ListarSolicitudesPendienteDeVerificacionDeDatos']);
 Route::post('/solicitud-pre-aprobadas', [SolicitudController::class, 'ListarSolicitudesPreAprobadas']);
+Route::post('/solicitud-aprobadas', [SolicitudController::class, 'ListarSolicitudesAprobadas']);
 Route::get('/obtener-departamentos', [DepartamentoController::class,'ObtenerDepartamento']);
 Route::get('/obtener-provincias/{codDepartamento}', [ProvinciaController::class,'ObtenerProvincias']);
 Route::get('/obtener-distritos/{codProvincia}', [DistritoController::class,'ObtenerDistritos']);
 Route::post('/verificaciones-solicitud',[VerificarController::class,'VerificacionesSolicitud']);
 Route::post('/anularSolicitudPVC/{codigo}','App\Http\Controllers\SolicitudController@AnularSolicitudPVC');
 Route::post('/consultarDetalleSolicitud/{codigo}','App\Http\Controllers\SolicitudController@ConsultarDetalleSolicitudDeCredito');
+Route::post('/consultarDetalleSolicitudAprobada/{codigo}','App\Http\Controllers\SolicitudController@ConsultarDetalleSolicitudAprobada');
 Route::post('/aprobar-solicitud-pvc', [SolicitudController::class, 'AprobarSolicitudPVC']);
 Route::post('/rechazar-solicitud-pvc', [SolicitudController::class, 'RechazarSolicitudPVC']);
 Route::post('/aprobar-solicitud-pvd', [SolicitudController::class, 'AprobarSolicitudPVD']);
