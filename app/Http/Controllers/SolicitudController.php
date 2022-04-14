@@ -544,4 +544,77 @@ class SolicitudController extends Controller
         }
     }
 
+    public function AprobarSolicitudPVD(Request $request)
+    {
+        try 
+        {
+            $verificacionesCumplidas = Verificar::select('v1','v2','v3')
+                ->where('codSolicitud',$request['codSolicitud'])
+                ->where('estado','PVD')
+                ->first();
+            $solicitudPVC = Solicitud::find($request['codSolicitud']);
+            
+            if($solicitudPVC->estado=='PVD' && $verificacionesCumplidas['v1'] == 'AP' && $verificacionesCumplidas['v2'] == 'AP' && $verificacionesCumplidas['v3'] == 'AP')
+            {
+                $solicitudPVC->estado = 'PAC';
+                $solicitudPVC->save();
+                return response()->json( "Actualizado a PAC" ,200);
+            }
+            return response()->json($verificacionesCumplidas);
+        } 
+        catch (\Exception $e) 
+        {
+            return $e->getMessage();
+        } 
+    }
+    
+    public function RechazarSolicitudPVD(Request $request)
+    {
+        $solicitudPVC = Solicitud::find($request['codSolicitud']);
+
+        if($solicitudPVC->estado=='PVD')
+        {
+            $solicitudPVC->estado = 'REC';
+            $solicitudPVC->motRechazo = $request['motivo'];
+            $solicitudPVC->save();
+            return response()->json("Actualizado a Rechazado" ,200);
+        }
+    }
+
+    public function AprobarSolicitudPAC(Request $request)
+    {
+        try 
+        {
+            $verificacionesCumplidas = Verificar::select('v1','v2','v3','v4')
+                ->where('codSolicitud',$request['codSolicitud'])
+                ->where('estado','PAC')
+                ->first();
+            $solicitudPVC = Solicitud::find($request['codSolicitud']);
+            
+            if($solicitudPVC->estado=='PVD' && $verificacionesCumplidas['v1'] == 'AP' && $verificacionesCumplidas['v2'] == 'AP' && $verificacionesCumplidas['v3'] == 'AP' && $verificacionesCumplidas['v4'] == 'AP')
+            {
+                $solicitudPVC->estado = 'ACE';
+                $solicitudPVC->save();
+                return response()->json( "Actualizado a ACE" ,200);
+            }
+            return response()->json($verificacionesCumplidas);
+        } 
+        catch (\Exception $e) 
+        {
+            return $e->getMessage();
+        } 
+    }
+    
+    public function RechazarSolicitudPAC(Request $request)
+    {
+        $solicitudPVC = Solicitud::find($request['codSolicitud']);
+
+        if($solicitudPVC->estado=='PAC')
+        {
+            $solicitudPVC->estado = 'REC';
+            $solicitudPVC->motRechazo = $request['motivo'];
+            $solicitudPVC->save();
+            return response()->json("Actualizado a Rechazado" ,200);
+        }
+    }
 }

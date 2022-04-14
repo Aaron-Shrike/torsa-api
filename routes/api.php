@@ -77,3 +77,7 @@ Route::post('/anularSolicitudPVC/{codigo}','App\Http\Controllers\SolicitudContro
 Route::post('/consultarDetalleSolicitud/{codigo}','App\Http\Controllers\SolicitudController@ConsultarDetalleSolicitudDeCredito');
 Route::post('/aprobar-solicitud-pvc', [SolicitudController::class, 'AprobarSolicitudPVC']);
 Route::post('/rechazar-solicitud-pvc', [SolicitudController::class, 'RechazarSolicitudPVC']);
+Route::post('/aprobar-solicitud-pvd', [SolicitudController::class, 'AprobarSolicitudPVD']);
+Route::post('/rechazar-solicitud-pvd', [SolicitudController::class, 'RechazarSolicitudPVD']);
+Route::post('/aprobar-solicitud-pac', [SolicitudController::class, 'AprobarSolicitudPAC']);
+Route::post('/rechazar-solicitud-pac', [SolicitudController::class, 'RechazarSolicitudPAC']);
