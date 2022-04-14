@@ -68,6 +68,7 @@ Route::post('validarEmail', 'App\Http\Controllers\UsuarioController@ValidarEmail
 //Rutas de SolicitudController
 Route::get('/listarSolicitudesDia/{codigo}','App\Http\Controllers\SolicitudController@ListarSolicitudesDia');
 Route::post('/solicitud-pendiente-verificacion-crediticia', [SolicitudController::class, 'ListarSolicitudesPendienteDeVerificacionCrediticia']);
+Route::post('/solicitud-pendiente-verificacion-datos', [SolicitudController::class, 'ListarSolicitudesPendienteDeVerificacionDeDatos']);
 Route::get('/obtener-departamentos', [DepartamentoController::class,'ObtenerDepartamento']);
 Route::get('/obtener-provincias/{codDepartamento}', [ProvinciaController::class,'ObtenerProvincias']);
 Route::get('/obtener-distritos/{codProvincia}', [DistritoController::class,'ObtenerDistritos']);

@@ -254,7 +254,7 @@ class SolicitudController extends Controller
     {
         $data = array();
 
-        // --------------------- SOLICITUDES CON TODAS LAS  VERIFICACIONES APROBADAS --------------------    
+        // --------------------- SOLICITUDES CON TODAS LAS VERIFICACIONES APROBADAS --------------------    
         //Aqui conseguire las solicitudes que ya esten para aprobar osea que las tres verificaciones esten en AP (Aprobada)
         $consultaSA = Verificar::select('verificar.estado','verificar.codSolicitud','verificar.codVerificar',DB::raw('date_format(solicitud.fecha, "%d/%m/%Y") AS formatoFecha'),
                                 'socio.dni','socio.nombre','socio.apePaterno','socio.apeMaterno')
@@ -341,6 +341,116 @@ class SolicitudController extends Controller
             ->join("socio","socio.codSocio","solicitud.codSocio")
             ->where([
                 'solicitud.estado'=>'PVC'
+            ])
+            ->whereIn(
+                'solicitud.codSolicitud',$c->all()
+            )
+            ->orderBy('solicitud.fecha','asc')
+            ->get();
+
+            //Indice de colleciones:
+            // $consultaSA : Todas las solicitudes por Aprobar
+            // $consultaSNA : Todas las solicitudes No Aprobadas
+            // $diffA3A1 : Solicitudes que aun falten verificaciones
+            // $solicitudesNR : Solicitudes que aun no tienen veririficaciones
+
+            $data = [$consultaSA,$consultaSNA,$diffA3A1,$solicitudesNR];
+            return response()->json($data,200);
+           
+        
+    }
+
+    public function ListarSolicitudesPendienteDeVerificacionDeDatos()
+    {
+        $data = array();
+
+        // --------------------- SOLICITUDES CON TODAS LAS VERIFICACIONES APROBADAS --------------------    
+        //Aqui conseguire las solicitudes que ya esten para aprobar osea que las tres verificaciones esten en AP (Aprobada)
+        $consultaSA = Verificar::select('verificar.estado','verificar.codSolicitud','verificar.codVerificar',DB::raw('date_format(solicitud.fecha, "%d/%m/%Y") AS formatoFecha'),
+                                'socio.dni','socio.nombre','socio.apePaterno','socio.apeMaterno')
+                                ->join('solicitud','solicitud.codSolicitud','verificar.codSolicitud')
+                                ->join("socio","socio.codSocio","solicitud.codSocio")
+                                ->where([
+                                    'verificar.estado'=>'PVD',
+                                    ])
+                                ->where(['verificar.v1' => 'AP'])
+                                ->where(['verificar.v2' => 'AP'])
+                                ->where(['verificar.v3' => 'AP'])
+                                ->orderBy('solicitud.fecha','asc')
+                                ->get();
+        
+        // --------------------- SOLICITUDES CON VERIFICACIONES NO APROBADAS --------------------                            
+        //Aqui consigo las consultas que se van a rechazar, osea que tenga en cualquiera de sus verificaciones un NA (NO Aprobado)
+        $consultaSNA = Verificar::select('verificar.estado','verificar.codSolicitud','verificar.codVerificar',DB::raw('date_format(solicitud.fecha, "%d/%m/%Y") AS formatoFecha'),
+                                'socio.dni','socio.nombre','socio.apePaterno','socio.apeMaterno')
+                                ->join('solicitud','solicitud.codSolicitud','verificar.codSolicitud')
+                                ->join("socio","socio.codSocio","solicitud.codSocio")
+                                ->where([
+                                    'verificar.estado'=>'PVD',
+                                ])
+                                ->where(['verificar.v1' => 'NA'])->orwhere(['verificar.v2' => 'NA'])->orwhere(['verificar.v3' => 'NA'])
+                                ->orderBy('solicitud.fecha','asc')
+                                ->get();
+
+        // --------------------- SOLICITUDES CON VERIFICACIONES SIN TERMINAR --------------------
+        //Aqui se consiguen las solicitudes que en sus verificaciones tengan AP(Aprobado) pero no en los tres y NR(No Revisado)
+        $consultaNAND = Verificar::select('verificar.estado','verificar.codSolicitud','verificar.codVerificar',DB::raw('date_format(solicitud.fecha, "%d/%m/%Y") AS formatoFecha'),
+                                'socio.dni','socio.nombre','socio.apePaterno','socio.apeMaterno')
+                                ->join('solicitud','solicitud.codSolicitud','verificar.codSolicitud')
+                                ->join("socio","socio.codSocio","solicitud.codSocio")
+                                ->where([
+                                    'verificar.estado'=>'PVD',
+                                ])
+                                ->whereIn(
+                                    'verificar.v1',['AP','PR']  
+                                )
+                                ->whereIn(
+                                    'verificar.v2',['AP','PR']  
+                                )
+                                ->whereIn(
+                                    'verificar.v3',['AP','PR']  
+                                )
+                                ->orderBy('solicitud.fecha','asc')
+                                ->get();
+            $diffA3A1 = array();
+            $diffA3A1 = $consultaNAND->diff($consultaSA);
+
+            // ------------------- SOLICITUDES SIN VERIFICACIONES -------------------
+            // Aqui se obtienen las solicitudes que no tienes verificaciones realizadas
+            $solicitudesV = Verificar::select('verificar.estado','verificar.codSolicitud','verificar.codVerificar',DB::raw('date_format(solicitud.fecha, "%d/%m/%Y") AS formatoFecha'),
+            'socio.dni','socio.nombre','socio.apePaterno','socio.apeMaterno')
+            ->join('solicitud','solicitud.codSolicitud','verificar.codSolicitud')
+            ->join("socio","socio.codSocio","solicitud.codSocio")
+            ->where([
+                'verificar.estado'=>'PVD',
+                ])
+            ->orderBy('solicitud.fecha','asc')
+            ->get();
+
+            $solicitudesNoRevisadas = Solicitud::select(
+                'solicitud.codSolicitud','solicitud.fecha',
+                 DB::raw('date_format(solicitud.fecha, "%d/%m/%Y") AS formatoFecha'),
+                'socio.dni','socio.nombre','socio.apePaterno','socio.apeMaterno')
+            ->join("socio","socio.codSocio","solicitud.codSocio")
+            ->where([
+                'solicitud.estado'=>'PVD'
+            ])
+            ->orderBy('solicitud.fecha','asc')
+            ->get();
+            //Creo los array necesario para obtener la diferencia entre solicitudes totales y las solicitudes que estan en verificacion
+            $a = array();
+            $b = array();           
+            $a = $solicitudesNoRevisadas->pluck('codSolicitud');
+            $b = $solicitudesV->pluck('codSolicitud');
+            $c = $a->diff($b);
+            //Aqui busco con las keys del array $c, las solicitudes que aun no se ha hecho ninguna verificacion
+            $solicitudesNR = Solicitud::select(
+                'solicitud.codSolicitud','solicitud.fecha',
+                 DB::raw('date_format(solicitud.fecha, "%d/%m/%Y") AS formatoFecha'),
+                'socio.dni','socio.nombre','socio.apePaterno','socio.apeMaterno')
+            ->join("socio","socio.codSocio","solicitud.codSocio")
+            ->where([
+                'solicitud.estado'=>'PVD'
             ])
             ->whereIn(
                 'solicitud.codSolicitud',$c->all()
