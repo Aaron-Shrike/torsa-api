@@ -626,12 +626,19 @@ class SolicitudController extends Controller
     public function RechazarSolicitudPVC(Request $request)
     {
         $solicitudPVC = Solicitud::find($request['codSolicitud']);
+        $varfija = ($request['codSolicitud']);
 
         if($solicitudPVC->estado=='PVC')
         {
             $solicitudPVC->estado = 'REC';
             $solicitudPVC->motRechazo = $request['motivo'];
             $solicitudPVC->save();
+            
+            $verificacionPVC = Verificar::where(
+                'verificar.codSolicitud', $varfija
+            )
+            ->update(['estado'=>'REC']);
+           
             return response()->json("Actualizado a Rechazado" ,200);
         }
     }
@@ -663,12 +670,16 @@ class SolicitudController extends Controller
     public function RechazarSolicitudPVD(Request $request)
     {
         $solicitudPVC = Solicitud::find($request['codSolicitud']);
-
+        $varfija = ($request['codSolicitud']);
         if($solicitudPVC->estado=='PVD')
         {
             $solicitudPVC->estado = 'REC';
             $solicitudPVC->motRechazo = $request['motivo'];
             $solicitudPVC->save();
+            $verificacionPVC = Verificar::where(
+                'verificar.codSolicitud', $varfija
+            )
+            ->update(['estado'=>'REC']);
             return response()->json("Actualizado a Rechazado" ,200);
         }
     }
