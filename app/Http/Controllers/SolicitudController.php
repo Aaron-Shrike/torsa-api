@@ -263,9 +263,7 @@ class SolicitudController extends Controller
                                 ->where([
                                     'verificar.estado'=>'PVC',
                                     ])
-                                ->where(['verificar.v1' => 'AP'])
-                                ->where(['verificar.v2' => 'AP'])
-                                ->where(['verificar.v3' => 'AP'])
+                                ->where(['verificar.v1' => 'AP','verificar.v2' => 'AP','verificar.v3' => 'AP'])
                                 ->orderBy('solicitud.fecha','asc')
                                 ->get();
         
@@ -278,7 +276,7 @@ class SolicitudController extends Controller
                                 ->where([
                                     'verificar.estado'=>'PVC',
                                 ])
-                                ->where(['verificar.v1' => 'NA'])->orwhere(['verificar.v2' => 'NA'])->orwhere(['verificar.v3' => 'NA'])
+                                ->where(['verificar.v1' => 'NA','verificar.v2' => 'NA','verificar.v3' => 'NA'])
                                 ->orderBy('solicitud.fecha','asc')
                                 ->get();
 
@@ -292,13 +290,13 @@ class SolicitudController extends Controller
                                     'verificar.estado'=>'PVC',
                                 ])
                                 ->whereIn(
-                                    'verificar.v1',['AP','PR']  
+                                    'verificar.v1',['AP','NR']  
                                 )
                                 ->whereIn(
-                                    'verificar.v2',['AP','PR']  
+                                    'verificar.v2',['AP','NR']  
                                 )
                                 ->whereIn(
-                                    'verificar.v3',['AP','PR']  
+                                    'verificar.v3',['AP','NR']  
                                 )
                                 ->orderBy('solicitud.fecha','asc')
                                 ->get();
@@ -373,9 +371,7 @@ class SolicitudController extends Controller
                                 ->where([
                                     'verificar.estado'=>'PVD',
                                     ])
-                                ->where(['verificar.v1' => 'AP'])
-                                ->where(['verificar.v2' => 'AP'])
-                                ->where(['verificar.v3' => 'AP'])
+                                ->where(['verificar.v1' => 'AP','verificar.v2' => 'AP','verificar.v3' => 'AP'])
                                 ->orderBy('solicitud.fecha','asc')
                                 ->get();
         
@@ -388,7 +384,7 @@ class SolicitudController extends Controller
                                 ->where([
                                     'verificar.estado'=>'PVD',
                                 ])
-                                ->where(['verificar.v1' => 'NA'])->orwhere(['verificar.v2' => 'NA'])->orwhere(['verificar.v3' => 'NA'])
+                                ->where(['verificar.v1' => 'NA','verificar.v2' => 'NA','verificar.v3' => 'NA'])
                                 ->orderBy('solicitud.fecha','asc')
                                 ->get();
 
@@ -402,13 +398,13 @@ class SolicitudController extends Controller
                                     'verificar.estado'=>'PVD',
                                 ])
                                 ->whereIn(
-                                    'verificar.v1',['AP','PR']  
+                                    'verificar.v1',['AP','NR']  
                                 )
                                 ->whereIn(
-                                    'verificar.v2',['AP','PR']  
+                                    'verificar.v2',['AP','NR']  
                                 )
                                 ->whereIn(
-                                    'verificar.v3',['AP','PR']  
+                                    'verificar.v3',['AP','NR']  
                                 )
                                 ->orderBy('solicitud.fecha','asc')
                                 ->get();
@@ -466,8 +462,30 @@ class SolicitudController extends Controller
 
             $data = [$consultaSA,$consultaSNA,$diffA3A1,$solicitudesNR];
             return response()->json($data,200);
-           
-        
+    }
+    
+    public function Prueba()
+    {
+        $consultaNAND = Verificar::select('verificar.estado','verificar.codSolicitud','verificar.codVerificar',DB::raw('date_format(solicitud.fecha, "%d/%m/%Y") AS formatoFecha'),
+                                'socio.dni','socio.nombre','socio.apePaterno','socio.apeMaterno')
+                                ->join('solicitud','solicitud.codSolicitud','verificar.codSolicitud')
+                                ->join("socio","socio.codSocio","solicitud.codSocio")
+                                ->where([
+                                    'verificar.estado'=>'PVC',
+                                ])
+                                ->whereIn(
+                                    'verificar.v1',['AP','NR']  
+                                )
+                                ->whereIn(
+                                    'verificar.v2',['AP','NR']  
+                                )
+                                ->whereIn(
+                                    'verificar.v3',['AP','NR']  
+                                )
+                                ->orderBy('solicitud.fecha','asc')
+                                ->get();
+
+        return response([$consultaNAND]);
     }
 
     public function ListarSolicitudesPreAprobadas(){
@@ -533,9 +551,9 @@ class SolicitudController extends Controller
             ->where('garantesolicitud.codSolicitud',$cod)
             ->get();
 
-        $verificacion = Verificar::select('verificar.v1','verificar.v2','verificar.v3','verificar.v4')
-            ->where('verificar.codSolicitud',$cod)
-            ->where('verificar.estado',$solicitud->estado)
+        $verificacion = Verificar::select('v1','v2','v3','v4')
+            ->where('codSolicitud',$cod)
+            ->where('estado',$solicitud->estado)
             ->first();
 
         $data = [$solicitud,$garantes,$verificacion];
