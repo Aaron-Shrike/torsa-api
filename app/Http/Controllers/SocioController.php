@@ -191,6 +191,7 @@ class SocioController extends Controller
         }
 
     }
+
     public function BuscarSocioGaranteHabilitado($dni)
     {
         try
@@ -201,7 +202,6 @@ class SocioController extends Controller
                 'error' => true,
                 'mensaje' => ""
             ];
-
             //Busca socio por el dni
             $socio = Socio::select("socio.codSocio","socio.dni","socio.nombre","socio.apePaterno","socio.apeMaterno",
                     "socio.fecNacimiento","socio.telefono","socio.domicilio","socio.tipo", "socio.activo")
@@ -210,7 +210,7 @@ class SocioController extends Controller
                     ])
                     ->first();
 
-            if(isset($socio['dni']))
+            if(isset($socio['codSocio']))
             {  
                 if($socio['activo'] == "1")
                 {
@@ -228,11 +228,11 @@ class SocioController extends Controller
                         'activo'=> $socio['activo'],
                     ]; 
                     //Busca codigo socio en la tabla solicitud
-                    $verificaSocio = Socio::select('solicitud.estado','socio.codSocio','solicitud.fecha')
-                            ->join('solicitud','solicitud.codSocio','socio.codSocio')
-                            ->where('socio.codSocio','=',$socio['codSocio'])
+                    $verificaSocio = Solicitud::select('solicitud.codSolicitud','solicitud.codSocio','solicitud.fecha','solicitud.estado')
+                            ->where('solicitud.codSocio','=',$socio['codSocio'])
                             ->orderBy('solicitud.fecha','desc')
                             ->first();
+                    
                     if(isset($verificaSocio['codSocio']))
                     {   
                         if($verificaSocio['estado']=='REC' or $verificaSocio['estado']=='ANU')
@@ -247,13 +247,51 @@ class SocioController extends Controller
                             if(isset($verificaGarante['codSocio']))
                             {
                                 if($verificaGarante['estado']=='REC' or $verificaGarante['estado']=='ANU')
-                                {
-                                    return response($data);
+                                    {
+                                                //Busca codigo del socio en la tabla garantesolicitud
+                                    $contador = GaranteSolicitud::select('solicitud.estado','garantesolicitud.codSocio')
+                                    ->join('solicitud','solicitud.codSolicitud','garantesolicitud.codSolicitud')
+                                    ->join('socio','socio.codSocio','garantesolicitud.codSocio')
+                                    ->where('garantesolicitud.codSocio','=',$socio['codSocio'])
+                                    ->where('solicitud.estado' == 'PVC' || 'PVD' || 'ACE' || 'PAC')
+                                    ->count();
+                                    switch ($contador) {
+                                        case 0:
+                                            return response($data);
+                                            break;
+                                        case 1:
+                                            return response("Seguira el proceso, pero debera cumplir con la condicion de casa propia");
+                                            break;
+                                        case 2:   
+                                            return response("Alcanzo el maxímo de créditos vigentes");
+                                            break;
+                                        
+                                        default:
+                                            return $error = 'EQUIPO BACKEND NO PUDO HACERLO';
+                                            break;       
+                                    }   
                                 } 
                                 else
                                 {
-                                    $error['mensaje'] = "Es garante de una solicitud pendiente.";
-
+                                    
+                                    switch ($verificaGarante['estado']) {
+                                        case 'PVC':
+                                            return response('Tiene una solicitud registrada con fecha: ' . $verificaSocio['fecha'] . ' que se encuentra pendiente de verificación creditica ');
+                                            break;
+                                        case 'PVD':
+                                            return $error = 'Tiene una solicitud registrada con fecha: ' . $verificaSocio['fecha'] . 'que se encuentra pendiente de verificación de datos';
+                                            break;
+                                        case 'PAC':
+                                            return $error = 'Tiene una solicitud registrada con fecha: ' . $verificaSocio['fecha'] . 'que se encuentra pendiente de aprobación de crédito';
+                                            break;
+                                        case 'ACE':
+                                            return $error = 'Su solicitud registrada con fecha: ' . $verificaSocio['fecha'] . 'se encuentra aceptada';
+                                            break;
+                                        
+                                        default:
+                                            return $error = 'EQUIPO BACKEND ESTUVO AQUI';
+                                            break;
+                                        }
                                     return response($error);
                                 }           
                             }
@@ -264,77 +302,89 @@ class SocioController extends Controller
                         }
                         else
                         {
-                            $fechita = $verificaSocio['solicitud.fecha'];
+                            
                             switch ($verificaSocio['estado']) {
                                 case 'PVC':
-                                    $error = 'Tiene una solicitud registrada con fecha: ' . $fechita. ' que se encuentra pendiente de verificación creditica ';
+                                    $error='Tiene una solicitud registrada con fecha:' .$verificaSocio['fecha'].' que se encuentra pendiente de verificación de credito';
+                                    return $error;
                                     break;
                                 case 'PVD':
-                                    $error = 'Tiene una solicitud registrada con fecha: ' . $fechita. 'que se encuentra pendiente de verificación de datos';
+                                    return $error = 'Tiene una solicitud registrada con fecha: ' . $verificaSocio['fecha'] . 'que se encuentra pendiente de verificación de datos';
                                     break;
                                 case 'PAC':
-                                    $error = 'Tiene una solicitud registrada con fecha: ' . $fechita. 'que se encuentra pendiente de aprobación de crédito';
+                                    return $error = 'Tiene una solicitud registrada con fecha: ' . $verificaSocio['fecha'] . 'que se encuentra pendiente de aprobación de crédito';
                                     break;
                                 case 'ACE':
-                                    $error = 'Su solicitud registrada con fecha: ' . $fechita. 'se encuentra aceptada';
+                                    return $error = 'Su solicitud registrada con fecha: ' . $verificaSocio['fecha'] . 'se encuentra aceptada';
                                     break;
                                 
                                 default:
-                                    $error = 'Ale Garcia estuvo aqui ajajjajajajaja';
+                                    return $error = 'EQUIPO BACKEND NO PUDO HACERLO';
                                     break;
                             }
                            
-                            return response($error); 
                         }
                     }
                     else
                     {
-                        //Busca codigo del socio en la tabla garantesolicitud
-                        $contador = GaranteSolicitud::select('solicitud.estado','garantesolicitud.codSocio')
+                        $verificaGarante = GaranteSolicitud::select('solicitud.estado','garantesolicitud.codSocio')
                         ->join('solicitud','solicitud.codSolicitud','garantesolicitud.codSolicitud')
                         ->join('socio','socio.codSocio','garantesolicitud.codSocio')
                         ->where('garantesolicitud.codSocio','=',$socio['codSocio'])
-                        ->where('solicitud.estado' == 'PVC' || 'PVD' || 'ACE' || 'PAC')
-                        ->count();
-
-                        $verificaGarante = GaranteSolicitud::select('solicitud.estado','garantesolicitud.codSocio')
-                                ->join('solicitud','solicitud.codSolicitud','garantesolicitud.codSolicitud')
-                                ->join('socio','socio.codSocio','garantesolicitud.codSocio')
-                                ->where('garantesolicitud.codSocio','=',$socio['codSocio'])
-                                ->orderBy('solicitud.fecha','desc')
-                                ->first();
-                                
-                        switch ($contador) {
-                            case '0':
-                                return response($data);
-                                break;
-                            case '1':
-                                return response($data);
-                                break;
-                            case '2':   
-                                $vercasa = Verificar::join("solicitud","solicitud.codSolicitud","verificar.codSolicitud")
-                                ->select("v3")
-                                ->get();
-
-                                break;
-                            
-                            default:
-                                # code...
-                                break;
-                        }
-
-                       
-
+                        ->orderBy('solicitud.fecha','desc')
+                        ->first();
                         if(isset($verificaGarante['codSocio']))
                         {
                             if($verificaGarante['estado']=='REC' or $verificaGarante['estado']=='ANU')
                             {
-                                return response($data);
+                                        //Busca codigo del socio en la tabla garantesolicitud
+                                $contador = GaranteSolicitud::select('solicitud.estado','garantesolicitud.codSocio','solicitud.fecha')
+                                ->join('solicitud','solicitud.codSolicitud','garantesolicitud.codSolicitud')
+                                ->join('socio','socio.codSocio','garantesolicitud.codSocio')
+                                ->where('garantesolicitud.codSocio','=',$socio['codSocio'])
+                                ->where('solicitud.estado' == 'PVC' || 'PVD' || 'ACE' || 'PAC');
+
+                                $cont = $contador->count();
+
+    
+                                switch ($cont) {
+                                    case 0:
+                                        return response($data);
+                                        break;
+                                    case 1:
+                                        return response("Seguira el proceso, pero debera cumplir con la condicion de casa propia");
+                                        break;
+                                    case 2:   
+                                        return response("Alcanzo el maxímo de créditos vigentes");
+                                        break;
+                                    
+                                    default:
+                                        return $error = 'EQUIPO BACKEND NO PUDO HACERLO';
+                                        break;       
+                                }       
                             }   
                             else
                             {
-                                $error['mensaje'] = "Es garante de una solicitud pendiente.";
-                                return response($error);
+                                switch ($verificaGarante['estado']) {
+                                    case 'PVC':
+                                        $error='Tiene una solicitud registrada con fecha:' .$verificaGarante['fecha'].' que se encuentra pendiente de verificación de credito';
+                                        return $error;
+                                        break;
+                                    case 'PVD':
+                                        return $error = 'Tiene una solicitud registrada con fecha: ' . $verificaGarante['fecha'] . 'que se encuentra pendiente de verificación de datos';
+                                        break;
+                                    case 'PAC':
+                                        return $error = 'Tiene una solicitud registrada con fecha: ' . $verificaGarante['fecha'] . 'que se encuentra pendiente de aprobación de crédito';
+                                        break;
+                                    case 'ACE':
+                                        return $error = 'Su solicitud registrada con fecha: ' . $verificaGarante['fecha'] . 'se encuentra aceptada';
+                                        break;
+                                    
+                                    default:
+                                        return $error = 'EQUIPO BACKEND NO PUDO HACERLO';
+                                        break;
+                                }
+                           
                             }         
                         }
                         else
