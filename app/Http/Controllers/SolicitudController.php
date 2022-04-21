@@ -281,7 +281,7 @@ class SolicitudController extends Controller
                                 ->get();
 
         // --------------------- SOLICITUDES CON VERIFICACIONES SIN TERMINAR --------------------
-        //Aqui se consiguen las solicitudes que en sus verificaciones tengan AP(Aprobado) pero no en los tres y NA(No Aprobadas)
+        //Aqui se consiguen las solicitudes que en sus verificaciones tengan AP(Aprobado) pero no en los tres y NR(No Revisadas)
         $consultaNAND = Verificar::select('verificar.estado','verificar.codSolicitud','verificar.codVerificar',DB::raw('date_format(solicitud.fecha, "%d/%m/%Y") AS formatoFecha'),
                                 'socio.dni','socio.nombre','socio.apePaterno','socio.apeMaterno')
                                 ->join('solicitud','solicitud.codSolicitud','verificar.codSolicitud')
@@ -290,13 +290,13 @@ class SolicitudController extends Controller
                                     'verificar.estado'=>'PVC',
                                 ])
                                 ->whereIn(
-                                    'verificar.v1',['NR']  
+                                    'verificar.v1',['AP','NR']  
                                 )
                                 ->whereIn(
-                                    'verificar.v2',['NR']  
+                                    'verificar.v2',['AP','NR']  
                                 )
                                 ->whereIn(
-                                    'verificar.v3',['NR']  
+                                    'verificar.v3',['AP','NR']  
                                 )
                                 ->orderBy('solicitud.fecha','asc')
                                 ->get();
@@ -398,13 +398,13 @@ class SolicitudController extends Controller
                                     'verificar.estado'=>'PVD',
                                 ])
                                 ->whereIn(
-                                    'verificar.v1',['NR']  
+                                    'verificar.v1',['AP','NR']  
                                 )
                                 ->whereIn(
-                                    'verificar.v2',['NR']  
+                                    'verificar.v2',['AP','NR']  
                                 )
                                 ->whereIn(
-                                    'verificar.v3',['NR']  
+                                    'verificar.v3',['AP','NR']  
                                 )
                                 ->orderBy('solicitud.fecha','asc')
                                 ->get();
@@ -594,7 +594,7 @@ class SolicitudController extends Controller
                 $verificacionPVC = Verificar::where(
                     'verificar.codSolicitud', $request['codSolicitud']
                 )
-                ->update(['estado'=>'PVD']);
+                ->update(['estado'=>'PVD','v1'=>'NR','v2'=>'NR','v3'=>'NR']);
 
                 return response()->json( "Actualizado a PVD" ,200);
             }
@@ -643,7 +643,7 @@ class SolicitudController extends Controller
                 $verificacionPVC = Verificar::where(
                     'verificar.codSolicitud', $request['codSolicitud']
                 )
-                ->update(['estado'=>'PAC']);
+                ->update(['estado'=>'PAC','v1'=>'NR','v2'=>'NR','v3'=>'NR']);
 
                 return response()->json( "Actualizado a PAC" ,200);
             }
@@ -686,7 +686,7 @@ class SolicitudController extends Controller
             $verificacionPVC = Verificar::where(
                     'verificar.codSolicitud', $request['codSolicitud']
                 )
-                ->update(['estado'=>'ACE']);
+                ->update(['estado'=>'ACE','v1'=>'NR','v2'=>'NR','v3'=>'NR']);
             
             return response()->json( "Actualizado a ACE" ,200);
         } 
