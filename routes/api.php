@@ -11,6 +11,7 @@ use App\Http\Controllers\ContactoEmergenciaController;
 use App\Http\Controllers\DepartamentoController;
 use App\Http\Controllers\DistritoController;
 use App\Http\Controllers\ProvinciaController;
+use App\Http\Controllers\PruebaController;
 use App\Http\Controllers\SolicitudController;
 use App\Http\Controllers\TipoUsuarioController;
 use App\Http\Controllers\VerificarController;
@@ -40,7 +41,10 @@ Route::post('/iniciar-sesion', [UsuarioController::class, 'IniciarSesion']);
 Route::post('/cerrar-sesion', [UsuarioController::class, 'CerrarSesion']);
 
 // Registrar Solicitud
+Route::get('/buscar-garante-habilitado/{dni}', [SocioController::class, 'BuscarSocioHabilitadoAlt']); //funciona para el garante
+
 Route::get('/buscar-garante-habilitado/{dni}', [SocioController::class, 'BuscarSocioGaranteHabilitado']);
+Route::get('/buscar-socio-habilitado/{dni}', [SocioController::class, 'BuscarSocioHabilitado']);
 Route::get('/validar-telefono/{dni}', [SolicitudController::class, 'ValidarTelefonoSocioGarante']);
 Route::post('/registrar-solicitud', [SolicitudController::class, 'RegistrarSolicitud']);
 
@@ -99,7 +103,7 @@ Route::post('/solicitud-aprobadas', [SolicitudController::class, 'ListarSolicitu
 Route::post('/consultarDetalleSolicitudAprobada/{codigo}','App\Http\Controllers\SolicitudController@ConsultarDetalleSolicitudAprobada');
 //========================================================================================================
 
-Route::get('/prueba', [SolicitudController::class, 'Prueba']);
+Route::get('/prueba', [PruebaController::class, 'Prueba']);
 
 
 

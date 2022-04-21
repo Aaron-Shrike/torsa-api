@@ -463,30 +463,6 @@ class SolicitudController extends Controller
             $data = [$consultaSA,$consultaSNA,$diffA3A1,$solicitudesNR];
             return response()->json($data,200);
     }
-    
-    public function Prueba()
-    {
-        $consultaNAND = Verificar::select('verificar.estado','verificar.codSolicitud','verificar.codVerificar',DB::raw('date_format(solicitud.fecha, "%d/%m/%Y") AS formatoFecha'),
-                                'socio.dni','socio.nombre','socio.apePaterno','socio.apeMaterno')
-                                ->join('solicitud','solicitud.codSolicitud','verificar.codSolicitud')
-                                ->join("socio","socio.codSocio","solicitud.codSocio")
-                                ->where([
-                                    'verificar.estado'=>'PVC',
-                                ])
-                                ->whereIn(
-                                    'verificar.v1',['AP','NR']  
-                                )
-                                ->whereIn(
-                                    'verificar.v2',['AP','NR']  
-                                )
-                                ->whereIn(
-                                    'verificar.v3',['AP','NR']  
-                                )
-                                ->orderBy('solicitud.fecha','asc')
-                                ->get();
-
-        return response([$consultaNAND]);
-    }
 
     public function ListarSolicitudesPreAprobadas(){
         $data = array();
