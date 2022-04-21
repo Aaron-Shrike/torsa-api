@@ -628,14 +628,19 @@ class SolicitudController extends Controller
                 ->where('estado','PVD')
                 ->first();
             $solicitudPVC = Solicitud::find($request['codSolicitud']);
+            $varfija = ($request['codSolicitud']);
             
             if($solicitudPVC->estado=='PVD' && $verificacionesCumplidas['v1'] == 'AP' && $verificacionesCumplidas['v2'] == 'AP' && $verificacionesCumplidas['v3'] == 'AP')
             {
                 $solicitudPVC->estado = 'PAC';
                 $solicitudPVC->save();
+                $verificacionPVC = Verificar::where(
+                    'verificar.codSolicitud', $varfija
+                )
+                ->update(['estado'=>'PAC']);
                 return response()->json( "Actualizado a PAC" ,200);
             }
-            return response()->json($verificacionesCumplidas);
+            return response()->json("La solicitud pasa al estado Pendiente de Aprobacion Crediticia");
         } 
         catch (\Exception $e) 
         {
@@ -663,27 +668,21 @@ class SolicitudController extends Controller
     public function AprobarSolicitudPAC(Request $request)
     {
         $data = array();
+        $varfija = ($request['codSolicitud']);
         try 
         {
-            $verificacionesCumplidasPVC = Verificar::select('v1','v2','v3')
-                ->where('codSolicitud',$request['codSolicitud'])
-                ->where('estado','PVC')
-                ->first();
-            $verificacionesCumplidasPVD = Verificar::select('v1','v2','v3')
-                ->where('codSolicitud',$request['codSolicitud'])
-                ->where('estado','PVD')
-                ->first();
-            $solicitudPVC = Solicitud::find($request['codSolicitud']);
+                $solicitudPVC = Solicitud::find($request['codSolicitud']);
             
-            if(($solicitudPVC->estado=='PVC' && $verificacionesCumplidasPVC['v1'] == 'AP' && $verificacionesCumplidasPVC['v2'] == 'AP' && $verificacionesCumplidasPVC['v3'] == 'AP')&&
-                ($solicitudPVC->estado=='PVD' && $verificacionesCumplidasPVD['v1'] == 'AP' && $verificacionesCumplidasPVD['v2'] == 'AP' && $verificacionesCumplidasPVD['v3'] == 'AP'))
-            {
                 $solicitudPVC->estado = 'ACE';
                 $solicitudPVC->save();
+                $verificacionPVC = Verificar::where(
+                    'verificar.codSolicitud', $varfija
+                )
+                ->update(['estado'=>'ACE']);
                 return response()->json( "Actualizado a ACE" ,200);
-            }
-            $data = [$verificacionesCumplidasPVC,$verificacionesCumplidasPVD];
-            return response()->json($data);
+            
+           
+            return response()->json("Solicitud Aprobada");
         } 
         catch (\Exception $e) 
         {
