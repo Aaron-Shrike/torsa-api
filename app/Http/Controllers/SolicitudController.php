@@ -290,13 +290,13 @@ class SolicitudController extends Controller
                                     'verificar.estado'=>'PVC',
                                 ])
                                 ->whereIn(
-                                    'verificar.v1',['AP','NA']  
+                                    'verificar.v1',['NR']  
                                 )
                                 ->whereIn(
-                                    'verificar.v2',['AP','NA']  
+                                    'verificar.v2',['NR']  
                                 )
                                 ->whereIn(
-                                    'verificar.v3',['AP','NA']  
+                                    'verificar.v3',['NR']  
                                 )
                                 ->orderBy('solicitud.fecha','asc')
                                 ->get();
@@ -398,13 +398,13 @@ class SolicitudController extends Controller
                                     'verificar.estado'=>'PVD',
                                 ])
                                 ->whereIn(
-                                    'verificar.v1',['AP','NR']  
+                                    'verificar.v1',['NR']  
                                 )
                                 ->whereIn(
-                                    'verificar.v2',['AP','NR']  
+                                    'verificar.v2',['NR']  
                                 )
                                 ->whereIn(
-                                    'verificar.v3',['AP','NR']  
+                                    'verificar.v3',['NR']  
                                 )
                                 ->orderBy('solicitud.fecha','asc')
                                 ->get();
