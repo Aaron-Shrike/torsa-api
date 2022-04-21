@@ -43,7 +43,7 @@ Route::post('/cerrar-sesion', [UsuarioController::class, 'CerrarSesion']);
 // Registrar Solicitud
 Route::get('/buscar-garante-habilitado/{dni}', [SocioController::class, 'BuscarSocioHabilitadoAlt']); //funciona para el garante
 
-Route::get('/buscar-garante-habilitado/{dni}', [SocioController::class, 'BuscarSocioGaranteHabilitado']);
+Route::get('/buscar-socio-garante-habilitado/{dni}', [SocioController::class, 'BuscarSocioGaranteHabilitado']);
 Route::get('/buscar-socio-habilitado/{dni}', [SocioController::class, 'BuscarSocioHabilitado']);
 Route::get('/validar-telefono/{dni}', [SolicitudController::class, 'ValidarTelefonoSocioGarante']);
 Route::post('/registrar-solicitud', [SolicitudController::class, 'RegistrarSolicitud']);
