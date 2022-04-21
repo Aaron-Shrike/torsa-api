@@ -281,7 +281,7 @@ class SolicitudController extends Controller
                                 ->get();
 
         // --------------------- SOLICITUDES CON VERIFICACIONES SIN TERMINAR --------------------
-        //Aqui se consiguen las solicitudes que en sus verificaciones tengan AP(Aprobado) pero no en los tres y NR(No Revisado)
+        //Aqui se consiguen las solicitudes que en sus verificaciones tengan AP(Aprobado) pero no en los tres y NA(No Aprobadas)
         $consultaNAND = Verificar::select('verificar.estado','verificar.codSolicitud','verificar.codVerificar',DB::raw('date_format(solicitud.fecha, "%d/%m/%Y") AS formatoFecha'),
                                 'socio.dni','socio.nombre','socio.apePaterno','socio.apeMaterno')
                                 ->join('solicitud','solicitud.codSolicitud','verificar.codSolicitud')
@@ -290,13 +290,13 @@ class SolicitudController extends Controller
                                     'verificar.estado'=>'PVC',
                                 ])
                                 ->whereIn(
-                                    'verificar.v1',['AP','NR']  
+                                    'verificar.v1',['AP','NA']  
                                 )
                                 ->whereIn(
-                                    'verificar.v2',['AP','NR']  
+                                    'verificar.v2',['AP','NA']  
                                 )
                                 ->whereIn(
-                                    'verificar.v3',['AP','NR']  
+                                    'verificar.v3',['AP','NA']  
                                 )
                                 ->orderBy('solicitud.fecha','asc')
                                 ->get();
@@ -591,8 +591,10 @@ class SolicitudController extends Controller
                 $solicitudPVC->estado = 'PVD';
                 $solicitudPVC->save();
 
-                $verificacionesCumplidas->estado = 'PVD';
-                $verificacionesCumplidas->save();
+                $verificacionPVC = Verificar::where(
+                    'verificar.codSolicitud', $request['codSolicitud']
+                )
+                ->update(['estado'=>'PVD']);
 
                 return response()->json( "Actualizado a PVD" ,200);
             }
@@ -638,8 +640,11 @@ class SolicitudController extends Controller
                 $solicitudPVC->estado = 'PAC';
                 $solicitudPVC->save();
 
-                $verificacionesCumplidas->estado = 'PAC';
-                $verificacionesCumplidas->save();
+                $verificacionPVC = Verificar::where(
+                    'verificar.codSolicitud', $request['codSolicitud']
+                )
+                ->update(['estado'=>'PAC']);
+
                 return response()->json( "Actualizado a PAC" ,200);
             }
             return response()->json("La solicitud pasa al estado Pendiente de Aprobacion Crediticia");
@@ -659,27 +664,29 @@ class SolicitudController extends Controller
             $solicitudPVC->estado = 'REC';
             $solicitudPVC->motRechazo = $request['motivo'];
             $solicitudPVC->save();
+
             $verificacionPVC = Verificar::where(
                 'verificar.codSolicitud', $varfija
             )
             ->update(['estado'=>'REC']);
+
             return response()->json("Actualizado a Rechazado" ,200);
         }
     }
 
     public function AprobarSolicitudPAC(Request $request)
     {
-        $varfija = ($request['codSolicitud']);
         try 
         {
             $solicitudPVC = Solicitud::find($request['codSolicitud']);
-            $verificacionPVC = Verificar::where('verificar.codSolicitud', $varfija);
         
             $solicitudPVC->estado = 'ACE';
             $solicitudPVC->save();
             
-            $verificacionPVC->estado = 'ACE';
-            $verificacionPVC->save();
+            $verificacionPVC = Verificar::where(
+                    'verificar.codSolicitud', $request['codSolicitud']
+                )
+                ->update(['estado'=>'ACE']);
             
             return response()->json( "Actualizado a ACE" ,200);
         } 
@@ -692,7 +699,6 @@ class SolicitudController extends Controller
     public function RechazarSolicitudPAC(Request $request)
     {
         $solicitudPVC = Solicitud::find($request['codSolicitud']);
-        $verificacionPVC = Verificar::where('verificar.codSolicitud', $request['codSolicitud']);
 
         if($solicitudPVC->estado=='PAC')
         {
@@ -700,8 +706,10 @@ class SolicitudController extends Controller
             $solicitudPVC->motRechazo = $request['motivo'];
             $solicitudPVC->save();
 
-            $verificacionPVC->estado = 'REC';
-            $verificacionPVC->save();
+            $verificacionPVC = Verificar::where(
+                'verificar.codSolicitud', $request['codSolicitud']
+            )
+            ->update(['estado'=>'REC']);
 
             return response()->json("Actualizado a Rechazado" ,200);
         }
